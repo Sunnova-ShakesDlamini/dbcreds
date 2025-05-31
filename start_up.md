@@ -1,112 +1,79 @@
 # dbcreds Reference
 
-Auto-generated on 2025-05-31 12:14:04
+Auto-generated on 2025-05-31 17:10:31
+
 
 This file contains the latest source code for the dbcreds library.
 
 
-```toml # pyproject.toml
-# pyproject.toml
-[project]
-name = "dbcreds"
-version = "2.0.0"
-description = "Professional database credentials management with security and team collaboration in mind"
-readme = "README.md"
-authors = [
-    {name = "Your Company", email = "dev@yourcompany.com"}
-]
-license = {text = "MIT"}
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Topic :: Database",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Operating System :: OS Independent",
-]
-requires-python = ">=3.8"
-dependencies = [
-    "pydantic>=2.0.0",
-    "pydantic-settings>=2.0.0",
-    "typer[all]>=0.9.0",
-    "rich>=13.0.0",
-    "loguru>=0.7.0",
-    "keyring>=24.0.0",
-    "psycopg2-binary>=2.9.0",
-    "sqlalchemy>=2.0.0",
-    "python-multipart>=0.0.6",
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "jinja2>=3.1.0",
-    "python-jose[cryptography]>=3.3.0",
-    "passlib[bcrypt]>=1.7.4",
-    "aiofiles>=23.0.0",
-]
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "pytest-mock>=3.11.0",
-    "black>=23.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocstrings[python]>=0.23.0",
-]
-mysql = ["mysqlclient>=2.2.0"]
-oracle = ["oracledb>=1.4.0"]
-mssql = ["pyodbc>=5.0.0"]
+## Directory Structure
 
-[project.scripts]
-dbcreds = "dbcreds.cli:app"
-dbcreds-server = "dbcreds.web.__main__:main"
-dbcreds-migrate = "dbcreds.migrate:app"
 
-[project.urls]
-Homepage = "https://github.com/yourcompany/dbcreds"
-Documentation = "https://yourcompany.github.io/dbcreds"
-Repository = "https://github.com/yourcompany/dbcreds"
-Issues = "https://github.com/yourcompany/dbcreds/issues"
+Project organization showing the key files and their relationships:
 
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["dbcreds", "dbcreds.backends", "dbcreds.core", "dbcreds.web", "dbcreds.utils"]
 
-[tool.ruff]
-line-length = 120
-target-version = "py38"
-
-[tool.mypy]
-python_version = "3.8"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
-
-# uv configuration
-[tool.uv]
-managed = true
-dev-dependencies = [
-    "ipython>=8.12.0",
-    "ipdb>=0.13.13",
-]
+```
+dbcreds/
+├── __init__.py
+├── cli.py
+├── migrate.py
+├── backends/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── config.py
+│   ├── environment.py
+│   ├── keyring.py
+│   ├── legacy_windows.py
+│   └── windows.py
+├── core/
+│   ├── __init__.py
+│   ├── exceptions.py
+│   ├── manager.py
+│   ├── models.py
+│   └── security.py
+├── utils/
+│   ├── __init__.py
+│   └── shortcuts.py
+└── web/
+    ├── __init__.py
+    ├── __main__.py
+    ├── auth.py
+    ├── errors.py
+    ├── main.py
+    └── templates/
+        ├── base.html
+        ├── index.html
+        ├── settings.html
+        └── partials/
+            └── environment_list.html
 ```
 
-# Project Documentation
+``` # LICENSE
+MIT License
+
+Copyright (c) 2025 Thandolwethu Dlamini
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+```
 
 # dbcreds
 
@@ -256,11 +223,119 @@ mkdocs serve
 
 MIT License - see LICENSE file for details.
 
+```toml # pyproject.toml
+# pyproject.toml
+[project]
+name = "dbcreds"
+version = "2.0.0"
+description = "Professional database credentials management with security and team collaboration in mind"
+readme = "README.md"
+authors = [
+    {name = "Your Company", email = "dev@yourcompany.com"}
+]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Database",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "loguru>=0.7.0",
+    "keyring>=24.0.0",
+    "psycopg2-binary>=2.9.0",
+    "sqlalchemy>=2.0.0",
+    "python-multipart>=0.0.6",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "jinja2>=3.1.0",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "aiofiles>=23.0.0",
+    "httpx>=0.28.1",
+]
 
-## Core Modules
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.23.0",
+]
+mysql = ["mysqlclient>=2.2.0"]
+oracle = ["oracledb>=1.4.0"]
+mssql = ["pyodbc>=5.0.0"]
+
+[project.scripts]
+dbcreds = "dbcreds.cli:app"
+dbcreds-server = "dbcreds.web.__main__:main"
+dbcreds-migrate = "dbcreds.migrate:app"
+
+[project.urls]
+Homepage = "https://github.com/yourcompany/dbcreds"
+Documentation = "https://yourcompany.github.io/dbcreds"
+Repository = "https://github.com/yourcompany/dbcreds"
+Issues = "https://github.com/yourcompany/dbcreds/issues"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dbcreds", "dbcreds.backends", "dbcreds.core", "dbcreds.web", "dbcreds.utils"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    "ignore::DeprecationWarning:fastapi",
+    "ignore::DeprecationWarning:pytest_asyncio.plugin",
+]
+
+# uv configuration
+[tool.uv]
+managed = true
+dev-dependencies = [
+    "ipython>=8.12.0",
+    "ipdb>=0.13.13",
+]
+
+```
 
 
-```python # dbcreds/__init__.py
+## Core
+
+
+```python # dbcreds\__init__.py
 # dbcreds/__init__.py
 """
 dbcreds - Professional database credentials management.
@@ -314,7 +389,17 @@ else:
     logger.add(sys.stderr, level="WARNING")
 ```
 
-```python # dbcreds/core/__init__.py
+```python # dbcreds\backends\__init__.py
+# dbcreds/backends/__init__.py
+"""Credential storage backends."""
+
+# Remove all imports - just define __all__
+__all__ = ["CredentialBackend", "ConfigFileBackend", "EnvironmentBackend", "KeyringBackend"]
+
+# No actual imports here - let modules import directly from submodules
+```
+
+```python # dbcreds\core\__init__.py
 # dbcreds/core/__init__.py
 """Core functionality for dbcreds."""
 
@@ -326,170 +411,46 @@ __all__ = ["CredentialManager", "DatabaseCredentials", "DatabaseType", "Environm
 
 ```
 
-```python # dbcreds/core/models.py
-# dbcreds/core/models.py
+```python # dbcreds\core\exceptions.py
+# dbcreds/core/exceptions.py
 """
-Pydantic models for database credentials.
+Custom exceptions for dbcreds.
 
-This module defines the data models used throughout dbcreds for type safety
-and validation.
+This module defines all custom exceptions used throughout the package.
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, SecretStr, field_validator
+class CredentialError(Exception):
+    """Base exception for all credential-related errors."""
 
-
-class DatabaseType(str, Enum):
-    """Supported database types."""
-
-    POSTGRESQL = "postgresql"
-    MYSQL = "mysql"
-    ORACLE = "oracle"
-    MSSQL = "mssql"
-    SQLITE = "sqlite"
+    pass
 
 
-class Environment(BaseModel):
-    """
-    Database environment configuration.
+class CredentialNotFoundError(CredentialError):
+    """Raised when requested credentials are not found."""
 
-    Represents a named database environment (e.g., dev, staging, prod) with
-    its associated settings.
-
-    Attributes:
-        name: Environment name (e.g., 'dev', 'prod')
-        database_type: Type of database
-        description: Optional description of the environment
-        is_production: Whether this is a production environment
-        created_at: When the environment was created
-        updated_at: When the environment was last updated
-    """
-
-    name: str = Field(..., min_length=1, max_length=50, pattern=r"^[a-zA-Z0-9_-]+$")
-    database_type: DatabaseType
-    description: Optional[str] = None
-    is_production: bool = False
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-    @field_validator("name")
-    @classmethod
-    def validate_name(cls, v: str) -> str:
-        """Validate environment name."""
-        return v.lower()
+    pass
 
 
-class DatabaseCredentials(BaseModel):
-    """
-    Database connection credentials.
+class PasswordExpiredError(CredentialError):
+    """Raised when a password has expired."""
 
-    Secure storage model for database connection information.
-
-    Attributes:
-        environment: Environment name
-        host: Database server hostname or IP
-        port: Database server port
-        database: Database name
-        username: Database username
-        password: Database password (stored securely)
-        options: Additional connection options
-        ssl_mode: SSL connection mode
-        password_updated_at: When the password was last updated
-        password_expires_at: When the password expires
-    """
-
-    environment: str
-    host: str
-    port: int = Field(..., gt=0, le=65535)
-    database: str
-    username: str
-    password: SecretStr
-    options: Dict[str, Any] = Field(default_factory=dict)
-    ssl_mode: Optional[str] = None
-    password_updated_at: datetime = Field(default_factory=datetime.utcnow)
-    password_expires_at: Optional[datetime] = None
-
-    @field_validator("port")
-    @classmethod
-    def validate_port(cls, v: int, info) -> int:
-        """Set default port based on database type if not specified."""
-        if v is None and hasattr(info, "context") and "database_type" in info.context:
-            db_type = info.context["database_type"]
-            defaults = {
-                DatabaseType.POSTGRESQL: 5432,
-                DatabaseType.MYSQL: 3306,
-                DatabaseType.ORACLE: 1521,
-                DatabaseType.MSSQL: 1433,
-            }
-            return defaults.get(db_type, v)
-        return v
-
-    def get_connection_string(self, include_password: bool = True, driver: Optional[str] = None) -> str:
-        """
-        Generate a connection string for the database.
-
-        Args:
-            include_password: Whether to include the password in the connection string
-            driver: Optional driver override for the connection string
-
-        Returns:
-            Database connection URI
-
-        Examples:
-            >>> creds.get_connection_string()
-            'postgresql://user:pass@localhost:5432/mydb'
-            >>> creds.get_connection_string(include_password=False)
-            'postgresql://user@localhost:5432/mydb'
-        """
-        # This would be implemented based on database type
-        # For now, return a PostgreSQL example
-        password_part = f":{self.password.get_secret_value()}" if include_password else ""
-        return f"postgresql://{self.username}{password_part}@{self.host}:{self.port}/{self.database}"
-
-    def is_password_expired(self) -> bool:
-        """Check if the password has expired."""
-        if self.password_expires_at is None:
-            return False
-        return datetime.utcnow() > self.password_expires_at
-
-    def days_until_expiry(self) -> Optional[int]:
-        """Get the number of days until password expiry."""
-        if self.password_expires_at is None:
-            return None
-        delta = self.password_expires_at - datetime.utcnow()
-        return delta.days if delta.days > 0 else 0
+    pass
 
 
-class CredentialMetadata(BaseModel):
-    """
-    Metadata about stored credentials.
+class BackendError(CredentialError):
+    """Raised when a backend operation fails."""
 
-    Tracks additional information about credentials for management purposes.
+    pass
 
-    Attributes:
-        environment: Environment name
-        created_by: User who created the credentials
-        created_at: When the credentials were created
-        last_accessed: When the credentials were last accessed
-        access_count: Number of times accessed
-        last_tested: When the connection was last tested
-        last_test_success: Whether the last test was successful
-    """
 
-    environment: str
-    created_by: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_accessed: Optional[datetime] = None
-    access_count: int = 0
-    last_tested: Optional[datetime] = None
-    last_test_success: Optional[bool] = None
+class ValidationError(CredentialError):
+    """Raised when credential validation fails."""
 
+    pass
 ```
 
-```python # dbcreds/core/manager.py
+```python # dbcreds\core\manager.py
 # dbcreds/core/manager.py
 """
 Core credential manager implementation.
@@ -499,7 +460,7 @@ credential storage and retrieval across different backends.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Type
 
 from loguru import logger
@@ -518,8 +479,8 @@ from dbcreds.core.models import DatabaseCredentials, DatabaseType, Environment
 
 # Conditional import for Windows
 if os.name == "nt":
-    from dbcreds.backends.windows import WindowsCredentialBackend
     from dbcreds.backends.legacy_windows import LegacyWindowsBackend
+    from dbcreds.backends.windows import WindowsCredentialBackend
 
 
 class CredentialManager:
@@ -557,7 +518,9 @@ class CredentialManager:
         self._initialize_backends()
         self._load_environments()
 
-        logger.debug(f"Initialized CredentialManager with {len(self.backends)} backends")
+        logger.debug(
+            f"Initialized CredentialManager with {len(self.backends)} backends"
+        )
 
     def _initialize_backends(self) -> None:
         """Initialize available credential backends in priority order."""
@@ -582,7 +545,9 @@ class CredentialManager:
                 logger.debug(f"Failed to initialize {backend_class.__name__}: {e}")
 
         if not self.backends:
-            logger.warning("No credential backends available, falling back to config file only")
+            logger.warning(
+                "No credential backends available, falling back to config file only"
+            )
             self.backends.append(ConfigFileBackend(self.config_dir))
 
     def _load_environments(self) -> None:
@@ -706,7 +671,9 @@ class CredentialManager:
         # Calculate password expiration
         password_expires_at = None
         if password_expires_days:
-            password_expires_at = datetime.utcnow() + timedelta(days=password_expires_days)
+            password_expires_at = datetime.now(timezone.utc) + timedelta(
+                days=password_expires_days
+            )
 
         # Create credentials object
         creds = DatabaseCredentials(
@@ -724,7 +691,9 @@ class CredentialManager:
         stored = False
         for backend in self.backends:
             try:
-                if backend.set_credential(f"dbcreds:{env_name}", username, password, creds.model_dump()):
+                if backend.set_credential(
+                    f"dbcreds:{env_name}", username, password, creds.model_dump()
+                ):
                     stored = True
                     logger.debug(f"Stored credentials in {backend.__class__.__name__}")
             except Exception as e:
@@ -736,7 +705,9 @@ class CredentialManager:
         logger.info(f"Stored credentials for environment: {env_name}")
         return creds
 
-    def get_credentials(self, environment: str, check_expiry: bool = True) -> DatabaseCredentials:
+    def get_credentials(
+        self, environment: str, check_expiry: bool = True
+    ) -> DatabaseCredentials:
         """
         Retrieve credentials for an environment.
 
@@ -777,12 +748,16 @@ class CredentialManager:
                             f"Password for environment '{environment}' has expired"
                         )
 
-                    logger.debug(f"Retrieved credentials from {backend.__class__.__name__}")
+                    logger.debug(
+                        f"Retrieved credentials from {backend.__class__.__name__}"
+                    )
                     return creds
             except Exception as e:
                 logger.debug(f"Failed to get from {backend.__class__.__name__}: {e}")
 
-        raise CredentialNotFoundError(f"No credentials found for environment '{environment}'")
+        raise CredentialNotFoundError(
+            f"No credentials found for environment '{environment}'"
+        )
 
     def list_environments(self) -> List[Environment]:
         """
@@ -838,53 +813,331 @@ class CredentialManager:
     def _save_environments(self) -> None:
         """Save environment configurations to disk."""
         config_backend = ConfigFileBackend(self.config_dir)
-        config_backend.save_environments([env.model_dump() for env in self.environments.values()])
+        config_backend.save_environments(
+            [env.model_dump() for env in self.environments.values()]
+        )
+
 ```
 
-```python # dbcreds/core/exceptions.py
-# dbcreds/core/exceptions.py
+```python # dbcreds\core\models.py
+# dbcreds/core/models.py
 """
-Custom exceptions for dbcreds.
+Pydantic models for database credentials.
 
-This module defines all custom exceptions used throughout the package.
+This module defines the data models used throughout dbcreds for type safety
+and validation.
 """
 
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, Dict, Optional
 
-class CredentialError(Exception):
-    """Base exception for all credential-related errors."""
-
-    pass
-
-
-class CredentialNotFoundError(CredentialError):
-    """Raised when requested credentials are not found."""
-
-    pass
+from pydantic import BaseModel, Field, SecretStr, field_validator
 
 
-class PasswordExpiredError(CredentialError):
-    """Raised when a password has expired."""
+class DatabaseType(str, Enum):
+    """Supported database types."""
 
-    pass
-
-
-class BackendError(CredentialError):
-    """Raised when a backend operation fails."""
-
-    pass
+    POSTGRESQL = "postgresql"
+    MYSQL = "mysql"
+    ORACLE = "oracle"
+    MSSQL = "mssql"
+    SQLITE = "sqlite"
 
 
-class ValidationError(CredentialError):
-    """Raised when credential validation fails."""
+class Environment(BaseModel):
+    """
+    Database environment configuration.
 
-    pass
+    Represents a named database environment (e.g., dev, staging, prod) with
+    its associated settings.
+
+    Attributes:
+        name: Environment name (e.g., 'dev', 'prod')
+        database_type: Type of database
+        description: Optional description of the environment
+        is_production: Whether this is a production environment
+        created_at: When the environment was created
+        updated_at: When the environment was last updated
+    """
+
+    name: str = Field(..., min_length=1, max_length=50, pattern=r"^[a-zA-Z0-9_-]+$")
+    database_type: DatabaseType
+    description: Optional[str] = None
+    is_production: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str) -> str:
+        """Validate environment name."""
+        return v.lower()
+
+    @field_validator("created_at", "updated_at", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v
+
+
+class DatabaseCredentials(BaseModel):
+    """
+    Database connection credentials.
+
+    Secure storage model for database connection information.
+
+    Attributes:
+        environment: Environment name
+        host: Database server hostname or IP
+        port: Database server port
+        database: Database name
+        username: Database username
+        password: Database password (stored securely)
+        options: Additional connection options
+        ssl_mode: SSL connection mode
+        password_updated_at: When the password was last updated
+        password_expires_at: When the password expires
+    """
+
+    environment: str
+    host: str
+    port: int = Field(..., gt=0, le=65535)
+    database: str
+    username: str
+    password: SecretStr
+    options: Dict[str, Any] = Field(default_factory=dict)
+    ssl_mode: Optional[str] = None
+    password_updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
+    password_expires_at: Optional[datetime] = None
+
+    @field_validator("port")
+    @classmethod
+    def validate_port(cls, v: int, info) -> int:
+        """Set default port based on database type if not specified."""
+        if v is None and hasattr(info, "context") and "database_type" in info.context:
+            db_type = info.context["database_type"]
+            defaults = {
+                DatabaseType.POSTGRESQL: 5432,
+                DatabaseType.MYSQL: 3306,
+                DatabaseType.ORACLE: 1521,
+                DatabaseType.MSSQL: 1433,
+            }
+            return defaults.get(db_type, v)
+        return v
+
+    @field_validator("password_updated_at", "password_expires_at", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v
+
+    def get_connection_string(
+        self, include_password: bool = True, driver: Optional[str] = None
+    ) -> str:
+        """
+        Generate a connection string for the database.
+
+        Args:
+            include_password: Whether to include the password in the connection string
+            driver: Optional driver override for the connection string
+
+        Returns:
+            Database connection URI
+
+        Examples:
+            >>> creds.get_connection_string()
+            'postgresql://user:pass@localhost:5432/mydb'
+            >>> creds.get_connection_string(include_password=False)
+            'postgresql://user@localhost:5432/mydb'
+        """
+        # This would be implemented based on database type
+        # For now, return a PostgreSQL example
+        password_part = (
+            f":{self.password.get_secret_value()}" if include_password else ""
+        )
+        return f"postgresql://{self.username}{password_part}@{self.host}:{self.port}/{self.database}"
+
+    def is_password_expired(self) -> bool:
+        """Check if the password has expired."""
+        if self.password_expires_at is None:
+            return False
+
+        # Ensure both datetimes are timezone-aware for comparison
+        expires_at = self.password_expires_at
+        if expires_at.tzinfo is None:
+            # If naive, assume it was UTC
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        return datetime.now(timezone.utc) > expires_at
+
+    def days_until_expiry(self) -> Optional[int]:
+        """Get the number of days until password expiry."""
+        if self.password_expires_at is None:
+            return None
+
+        # Ensure both datetimes are timezone-aware for comparison
+        expires_at = self.password_expires_at
+        if expires_at.tzinfo is None:
+            # If naive, assume it was UTC
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        delta = expires_at - datetime.now(timezone.utc)
+        return max(0, delta.days)  # Return 0 if already expired
+
+
+class CredentialMetadata(BaseModel):
+    """
+    Metadata about stored credentials.
+
+    Tracks additional information about credentials for management purposes.
+
+    Attributes:
+        environment: Environment name
+        created_by: User who created the credentials
+        created_at: When the credentials were created
+        last_accessed: When the credentials were last accessed
+        access_count: Number of times accessed
+        last_tested: When the connection was last tested
+        last_test_success: Whether the last test was successful
+    """
+
+    environment: str
+    created_by: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_accessed: Optional[datetime] = None
+    access_count: int = 0
+    last_tested: Optional[datetime] = None
+    last_test_success: Optional[bool] = None
+
+    @field_validator("created_at", "last_accessed", "last_tested", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v
+
+```
+
+```python # dbcreds\core\security.py
+# dbcreds/core/security.py
+"""Security utilities for dbcreds."""
+
+import re
+from typing import Any, Dict
+
+from dbcreds.core.exceptions import ValidationError
+
+
+def sanitize_environment_name(name: str) -> str:
+    """Sanitize environment name to prevent injection attacks."""
+    if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+        raise ValidationError(
+            "Environment name can only contain letters, numbers, hyphens, and underscores"
+        )
+    return name.lower()
+
+
+def sanitize_connection_params(params: Dict[str, Any]) -> Dict[str, Any]:
+    """Sanitize connection parameters."""
+    # Remove any potentially dangerous keys
+    dangerous_keys = ["password", "passwd", "pwd"]
+    sanitized = {k: v for k, v in params.items() if k.lower() not in dangerous_keys}
+    
+    # Validate host
+    if "host" in sanitized:
+        if not re.match(r"^[a-zA-Z0-9.-]+$", sanitized["host"]):
+            raise ValidationError("Invalid host format")
+    
+    # Validate port
+    if "port" in sanitized:
+        try:
+            port = int(sanitized["port"])
+            if not 1 <= port <= 65535:
+                raise ValidationError("Port must be between 1 and 65535")
+        except (ValueError, TypeError):
+            raise ValidationError("Invalid port number")
+    
+    return sanitized
+
+
+def mask_password(connection_string: str) -> str:
+    """Mask password in connection strings for logging."""
+    # Pattern to match passwords in various connection string formats
+    patterns = [
+        r"(password=)([^;]+)",
+        r"(pwd=)([^;]+)",
+        r"(:\/\/[^:]+:)([^@]+)(@)",
+    ]
+    
+    masked = connection_string
+    for pattern in patterns:
+        masked = re.sub(pattern, r"\1****\3", masked, flags=re.IGNORECASE)
+    
+    return masked
+
+```
+
+```python # dbcreds\utils\__init__.py
+# dbcreds/utils/__init__.py
+"""Utility functions and shortcuts for dbcreds."""
+
+from dbcreds.utils.shortcuts import (
+    get_async_engine,
+    get_connection,
+    get_connection_string,
+    get_credentials,
+    get_engine,
+)
+
+__all__ = [
+    "get_connection",
+    "get_engine",
+    "get_async_engine",
+    "get_credentials",
+    "get_connection_string",
+]
+
+
+```
+
+```python # dbcreds\web\__init__.py
+# dbcreds/web/__init__.py
+"""Web interface for dbcreds using FastAPI and HTMX."""
+
+
 ```
 
 
-## Backend Implementations
+## Backends
 
 
-```python # dbcreds/backends/base.py
+```python # dbcreds\backends\base.py
 # dbcreds/backends/base.py
 """
 Base class for credential backends.
@@ -991,7 +1244,7 @@ class CredentialBackend(ABC):
         return []
 ```
 
-```python # dbcreds/backends/config.py
+```python # dbcreds\backends\config.py
 # dbcreds/backends/config.py
 """
 JSON configuration file backend.
@@ -1117,244 +1370,7 @@ class ConfigFileBackend(CredentialBackend):
 
 ```
 
-```python # dbcreds/backends/windows.py
-# dbcreds/backends/windows.py
-"""
-Windows Credential Manager backend.
-
-This backend provides secure credential storage using Windows Credential Manager
-through the Windows API.
-"""
-
-import ctypes
-import ctypes.wintypes
-import json
-import sys
-from typing import Any, Dict, Optional, Tuple
-
-from loguru import logger
-
-from dbcreds.backends.base import CredentialBackend
-
-
-class CREDENTIAL(ctypes.Structure):
-    """Windows CREDENTIAL structure."""
-
-    _fields_ = [
-        ("Flags", ctypes.wintypes.DWORD),
-        ("Type", ctypes.wintypes.DWORD),
-        ("TargetName", ctypes.wintypes.LPWSTR),
-        ("Comment", ctypes.wintypes.LPWSTR),
-        ("LastWritten", ctypes.wintypes.FILETIME),
-        ("CredentialBlobSize", ctypes.wintypes.DWORD),
-        ("CredentialBlob", ctypes.POINTER(ctypes.c_char)),
-        ("Persist", ctypes.wintypes.DWORD),
-        ("AttributeCount", ctypes.wintypes.DWORD),
-        ("Attributes", ctypes.c_void_p),
-        ("TargetAlias", ctypes.wintypes.LPWSTR),
-        ("UserName", ctypes.wintypes.LPWSTR),
-    ]
-
-
-class WindowsCredentialBackend(CredentialBackend):
-    """
-    Windows Credential Manager backend.
-
-    Uses the Windows API to securely store credentials in the Windows
-    Credential Manager.
-    """
-
-    CRED_TYPE_GENERIC = 1
-    CRED_PERSIST_LOCAL_MACHINE = 2
-
-    def __init__(self):
-        """Initialize Windows API functions."""
-        if sys.platform != "win32":
-            raise RuntimeError("Windows Credential Manager is only available on Windows")
-
-        self.advapi32 = ctypes.windll.advapi32
-
-        # CredReadW
-        self.advapi32.CredReadW.argtypes = [
-            ctypes.wintypes.LPCWSTR,
-            ctypes.wintypes.DWORD,
-            ctypes.wintypes.DWORD,
-            ctypes.POINTER(ctypes.POINTER(CREDENTIAL)),
-        ]
-        self.advapi32.CredReadW.restype = ctypes.wintypes.BOOL
-
-        # CredWriteW
-        self.advapi32.CredWriteW.argtypes = [ctypes.POINTER(CREDENTIAL), ctypes.wintypes.DWORD]
-        self.advapi32.CredWriteW.restype = ctypes.wintypes.BOOL
-
-        # CredDeleteW
-        self.advapi32.CredDeleteW.argtypes = [
-            ctypes.wintypes.LPCWSTR,
-            ctypes.wintypes.DWORD,
-            ctypes.wintypes.DWORD,
-        ]
-        self.advapi32.CredDeleteW.restype = ctypes.wintypes.BOOL
-
-        # CredFree
-        self.advapi32.CredFree.argtypes = [ctypes.c_void_p]
-
-    def is_available(self) -> bool:
-        """Check if Windows Credential Manager is available."""
-        return sys.platform == "win32"
-
-    def get_credential(self, key: str) -> Optional[Tuple[str, str, Dict[str, Any]]]:
-        """Retrieve credential from Windows Credential Manager."""
-        cred_ptr = ctypes.POINTER(CREDENTIAL)()
-
-        success = self.advapi32.CredReadW(key, self.CRED_TYPE_GENERIC, 0, ctypes.byref(cred_ptr))
-
-        if not success:
-            return None
-
-        try:
-            cred = cred_ptr.contents
-            username = cred.UserName if cred.UserName else ""
-
-            # Extract credential blob
-            blob_size = cred.CredentialBlobSize
-            if blob_size > 0:
-                # Credential blob contains JSON with password and metadata
-                blob_data = ctypes.string_at(cred.CredentialBlob, blob_size)
-                blob_str = blob_data.decode("utf-16le", errors="ignore").rstrip("\x00")
-
-                try:
-                    data = json.loads(blob_str)
-                    password = data.pop("password", "")
-                    return (username, password, data)
-                except json.JSONDecodeError:
-                    # Fallback for old format (password only)
-                    return (username, blob_str, {})
-            else:
-                return (username, "", {})
-        finally:
-            self.advapi32.CredFree(cred_ptr)
-
-    def set_credential(self, key: str, username: str, password: str, metadata: Dict[str, Any]) -> bool:
-        """Store credential in Windows Credential Manager."""
-        # First delete any existing credential
-        self.delete_credential(key)
-
-        # Prepare credential data as JSON
-        data = {"password": password, **metadata}
-        blob_str = json.dumps(data)
-        blob_bytes = blob_str.encode("utf-16le")
-
-        # Create credential structure
-        cred = CREDENTIAL()
-        cred.Type = self.CRED_TYPE_GENERIC
-        cred.Persist = self.CRED_PERSIST_LOCAL_MACHINE
-        cred.TargetName = ctypes.c_wchar_p(key)
-        cred.UserName = ctypes.c_wchar_p(username)
-        cred.CredentialBlobSize = len(blob_bytes)
-        cred.CredentialBlob = ctypes.cast(
-            ctypes.create_string_buffer(blob_bytes), ctypes.POINTER(ctypes.c_char)
-        )
-
-        success = self.advapi32.CredWriteW(ctypes.byref(cred), 0)
-        return bool(success)
-
-    def delete_credential(self, key: str) -> bool:
-        """Delete credential from Windows Credential Manager."""
-        success = self.advapi32.CredDeleteW(key, self.CRED_TYPE_GENERIC, 0)
-        return bool(success)
-
-```
-
-```python # dbcreds/backends/keyring.py
-# dbcreds/backends/keyring.py
-"""
-Cross-platform keyring backend using python-keyring.
-
-This backend provides secure credential storage using the system's
-native credential store (Keychain on macOS, Credential Manager on Windows,
-Secret Service on Linux).
-"""
-
-import json
-from typing import Any, Dict, Optional, Tuple
-
-import keyring
-from keyring.errors import KeyringError
-from loguru import logger
-
-from dbcreds.backends.base import CredentialBackend
-
-
-class KeyringBackend(CredentialBackend):
-    """
-    Keyring-based credential storage backend.
-
-    Uses the python-keyring library to store credentials in the system's
-    native credential store.
-    """
-
-    SERVICE_NAME = "dbcreds"
-
-    def is_available(self) -> bool:
-        """Check if keyring is available and functional."""
-        try:
-            # Test keyring by trying to get a non-existent key
-            keyring.get_password(self.SERVICE_NAME, "test_availability")
-            return True
-        except Exception as e:
-            logger.debug(f"Keyring not available: {e}")
-            return False
-
-    def get_credential(self, key: str) -> Optional[Tuple[str, str, Dict[str, Any]]]:
-        """Retrieve credential from keyring."""
-        try:
-            # Get the stored data
-            stored_data = keyring.get_password(self.SERVICE_NAME, key)
-            if not stored_data:
-                return None
-
-            # Parse the JSON data
-            data = json.loads(stored_data)
-            username = data.pop("username", "")
-            password = data.pop("password", "")
-
-            return (username, password, data)
-        except (KeyringError, json.JSONDecodeError) as e:
-            logger.error(f"Failed to retrieve credential from keyring: {e}")
-            return None
-
-    def set_credential(self, key: str, username: str, password: str, metadata: Dict[str, Any]) -> bool:
-        """Store credential in keyring."""
-        try:
-            # Combine all data into a single JSON object
-            data = {"username": username, "password": password, **metadata}
-            stored_data = json.dumps(data)
-
-            # Store in keyring
-            keyring.set_password(self.SERVICE_NAME, key, stored_data)
-            return True
-        except (KeyringError, json.JSONEncodeError) as e:
-            logger.error(f"Failed to store credential in keyring: {e}")
-            return False
-
-    def delete_credential(self, key: str) -> bool:
-        """Delete credential from keyring."""
-        try:
-            keyring.delete_password(self.SERVICE_NAME, key)
-            return True
-        except KeyringError as e:
-            logger.error(f"Failed to delete credential from keyring: {e}")
-            return False
-
-    def list_credentials(self) -> list[str]:
-        """List all dbcreds keys in keyring."""
-        # Note: python-keyring doesn't provide a way to list all keys
-        # This would need to be tracked separately
-        return []
-
-```
-
-```python # dbcreds/backends/environment.py
+```python # dbcreds\backends\environment.py
 # dbcreds/backends/environment.py
 """
 Environment variable backend for credential storage.
@@ -1463,7 +1479,96 @@ class EnvironmentBackend(CredentialBackend):
         return True
 ```
 
-```python # dbcreds/backends/legacy_windows.py
+```python # dbcreds\backends\keyring.py
+# dbcreds/backends/keyring.py
+"""
+Cross-platform keyring backend using python-keyring.
+
+This backend provides secure credential storage using the system's
+native credential store (Keychain on macOS, Credential Manager on Windows,
+Secret Service on Linux).
+"""
+
+import json
+from typing import Any, Dict, Optional, Tuple
+
+import keyring
+from keyring.errors import KeyringError
+from loguru import logger
+
+from dbcreds.backends.base import CredentialBackend
+
+
+class KeyringBackend(CredentialBackend):
+    """
+    Keyring-based credential storage backend.
+
+    Uses the python-keyring library to store credentials in the system's
+    native credential store.
+    """
+
+    SERVICE_NAME = "dbcreds"
+
+    def is_available(self) -> bool:
+        """Check if keyring is available and functional."""
+        try:
+            # Test keyring by trying to get a non-existent key
+            keyring.get_password(self.SERVICE_NAME, "test_availability")
+            return True
+        except Exception as e:
+            logger.debug(f"Keyring not available: {e}")
+            return False
+
+    def get_credential(self, key: str) -> Optional[Tuple[str, str, Dict[str, Any]]]:
+        """Retrieve credential from keyring."""
+        try:
+            # Get the stored data
+            stored_data = keyring.get_password(self.SERVICE_NAME, key)
+            if not stored_data:
+                return None
+
+            # Parse the JSON data
+            data = json.loads(stored_data)
+            username = data.pop("username", "")
+            password = data.pop("password", "")
+
+            return (username, password, data)
+        except (KeyringError, json.JSONDecodeError) as e:
+            logger.error(f"Failed to retrieve credential from keyring: {e}")
+            return None
+
+    def set_credential(self, key: str, username: str, password: str, metadata: Dict[str, Any]) -> bool:
+        """Store credential in keyring."""
+        try:
+            # Combine all data into a single JSON object
+            data = {"username": username, "password": password, **metadata}
+            stored_data = json.dumps(data)
+
+            # Store in keyring
+            keyring.set_password(self.SERVICE_NAME, key, stored_data)
+            return True
+        except (KeyringError, json.JSONEncodeError) as e:
+            logger.error(f"Failed to store credential in keyring: {e}")
+            return False
+
+    def delete_credential(self, key: str) -> bool:
+        """Delete credential from keyring."""
+        try:
+            keyring.delete_password(self.SERVICE_NAME, key)
+            return True
+        except KeyringError as e:
+            logger.error(f"Failed to delete credential from keyring: {e}")
+            return False
+
+    def list_credentials(self) -> list[str]:
+        """List all dbcreds keys in keyring."""
+        # Note: python-keyring doesn't provide a way to list all keys
+        # This would need to be tracked separately
+        return []
+
+```
+
+```python # dbcreds\backends\legacy_windows.py
 # dbcreds/backends/legacy_windows.py
 """
 Legacy Windows Credential Manager backend for existing credentials.
@@ -1612,690 +1717,228 @@ class LegacyWindowsBackend(WindowsCredentialBackend):
         return None
 ```
 
+```python # dbcreds\backends\windows.py
+# dbcreds/backends/windows.py
+"""
+Windows Credential Manager backend.
+
+This backend provides secure credential storage using Windows Credential Manager
+through the Windows API.
+"""
+
+import ctypes
+import ctypes.wintypes
+import json
+import sys
+from typing import Any, Dict, Optional, Tuple
+
+from loguru import logger
+
+from dbcreds.backends.base import CredentialBackend
+
+
+class CREDENTIAL(ctypes.Structure):
+    """Windows CREDENTIAL structure."""
+
+    _fields_ = [
+        ("Flags", ctypes.wintypes.DWORD),
+        ("Type", ctypes.wintypes.DWORD),
+        ("TargetName", ctypes.wintypes.LPWSTR),
+        ("Comment", ctypes.wintypes.LPWSTR),
+        ("LastWritten", ctypes.wintypes.FILETIME),
+        ("CredentialBlobSize", ctypes.wintypes.DWORD),
+        ("CredentialBlob", ctypes.POINTER(ctypes.c_char)),
+        ("Persist", ctypes.wintypes.DWORD),
+        ("AttributeCount", ctypes.wintypes.DWORD),
+        ("Attributes", ctypes.c_void_p),
+        ("TargetAlias", ctypes.wintypes.LPWSTR),
+        ("UserName", ctypes.wintypes.LPWSTR),
+    ]
+
+
+class WindowsCredentialBackend(CredentialBackend):
+    """
+    Windows Credential Manager backend.
+
+    Uses the Windows API to securely store credentials in the Windows
+    Credential Manager.
+    """
+
+    CRED_TYPE_GENERIC = 1
+    CRED_PERSIST_LOCAL_MACHINE = 2
+
+    def __init__(self):
+        """Initialize Windows API functions."""
+        if sys.platform != "win32":
+            raise RuntimeError("Windows Credential Manager is only available on Windows")
+
+        self.advapi32 = ctypes.windll.advapi32
+
+        # CredReadW
+        self.advapi32.CredReadW.argtypes = [
+            ctypes.wintypes.LPCWSTR,
+            ctypes.wintypes.DWORD,
+            ctypes.wintypes.DWORD,
+            ctypes.POINTER(ctypes.POINTER(CREDENTIAL)),
+        ]
+        self.advapi32.CredReadW.restype = ctypes.wintypes.BOOL
+
+        # CredWriteW
+        self.advapi32.CredWriteW.argtypes = [ctypes.POINTER(CREDENTIAL), ctypes.wintypes.DWORD]
+        self.advapi32.CredWriteW.restype = ctypes.wintypes.BOOL
+
+        # CredDeleteW
+        self.advapi32.CredDeleteW.argtypes = [
+            ctypes.wintypes.LPCWSTR,
+            ctypes.wintypes.DWORD,
+            ctypes.wintypes.DWORD,
+        ]
+        self.advapi32.CredDeleteW.restype = ctypes.wintypes.BOOL
+
+        # CredFree
+        self.advapi32.CredFree.argtypes = [ctypes.c_void_p]
+
+    def is_available(self) -> bool:
+        """Check if Windows Credential Manager is available."""
+        return sys.platform == "win32"
+
+    def get_credential(self, key: str) -> Optional[Tuple[str, str, Dict[str, Any]]]:
+        """Retrieve credential from Windows Credential Manager."""
+        cred_ptr = ctypes.POINTER(CREDENTIAL)()
+
+        success = self.advapi32.CredReadW(key, self.CRED_TYPE_GENERIC, 0, ctypes.byref(cred_ptr))
+
+        if not success:
+            return None
+
+        try:
+            cred = cred_ptr.contents
+            username = cred.UserName if cred.UserName else ""
+
+            # Extract credential blob
+            blob_size = cred.CredentialBlobSize
+            if blob_size > 0:
+                # Credential blob contains JSON with password and metadata
+                blob_data = ctypes.string_at(cred.CredentialBlob, blob_size)
+                blob_str = blob_data.decode("utf-16le", errors="ignore").rstrip("\x00")
+
+                try:
+                    data = json.loads(blob_str)
+                    password = data.pop("password", "")
+                    return (username, password, data)
+                except json.JSONDecodeError:
+                    # Fallback for old format (password only)
+                    return (username, blob_str, {})
+            else:
+                return (username, "", {})
+        finally:
+            self.advapi32.CredFree(cred_ptr)
+
+    def set_credential(self, key: str, username: str, password: str, metadata: Dict[str, Any]) -> bool:
+        """Store credential in Windows Credential Manager."""
+        # First delete any existing credential
+        self.delete_credential(key)
+
+        # Prepare credential data as JSON
+        data = {"password": password, **metadata}
+        blob_str = json.dumps(data)
+        blob_bytes = blob_str.encode("utf-16le")
+
+        # Create credential structure
+        cred = CREDENTIAL()
+        cred.Type = self.CRED_TYPE_GENERIC
+        cred.Persist = self.CRED_PERSIST_LOCAL_MACHINE
+        cred.TargetName = ctypes.c_wchar_p(key)
+        cred.UserName = ctypes.c_wchar_p(username)
+        cred.CredentialBlobSize = len(blob_bytes)
+        cred.CredentialBlob = ctypes.cast(
+            ctypes.create_string_buffer(blob_bytes), ctypes.POINTER(ctypes.c_char)
+        )
+
+        success = self.advapi32.CredWriteW(ctypes.byref(cred), 0)
+        return bool(success)
+
+    def delete_credential(self, key: str) -> bool:
+        """Delete credential from Windows Credential Manager."""
+        success = self.advapi32.CredDeleteW(key, self.CRED_TYPE_GENERIC, 0)
+        return bool(success)
+
+```
+
 
 ## Web Interface
 
 
-```python # dbcreds/web/__init__.py
-# dbcreds/web/__init__.py
-"""Web interface for dbcreds using FastAPI and HTMX."""
+```python # dbcreds\web\auth.py
+# dbcreds/web/auth.py
+"""Authentication for the web interface."""
 
+import secrets
+from datetime import datetime, timedelta
+from typing import Optional
+
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel
+
+# Configuration
+SECRET_KEY = secrets.token_urlsafe(32)  # In production, load from environment
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBasic()
+
+# Default admin credentials - CHANGE IN PRODUCTION
+DEFAULT_USERNAME = "admin"
+DEFAULT_PASSWORD_HASH = pwd_context.hash("changeme")
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against a hash."""
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+def authenticate_user(username: str, password: str) -> bool:
+    """Authenticate a user."""
+    if username == DEFAULT_USERNAME:
+        return verify_password(password, DEFAULT_PASSWORD_HASH)
+    return False
+
+
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    """Create a JWT token."""
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+async def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+    """Get the current authenticated user."""
+    if not authenticate_user(credentials.username, credentials.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 ```
 
-```python # dbcreds/web/__main__.py
-# dbcreds/web/__main__.py
-"""Entry point for dbcreds-server command."""
-
-import sys
-
-import typer
-from rich.console import Console
-
-from dbcreds.web.main import run_server
-
-console = Console()
-
-
-def main():
-    """Run the dbcreds web server."""
-    try:
-        run_server()
-    except KeyboardInterrupt:
-        console.print("\n[yellow]Server stopped by user[/yellow]")
-        sys.exit(0)
-    except Exception as e:
-        console.print(f"\n[bold red]Failed to start server:[/bold red] {e}")
-        console.print_exception()
-        sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
-```
-
-```python # dbcreds/web/main.py
-# dbcreds/web/main.py
-"""
-FastAPI web application for dbcreds.
-
-Provides a web interface for managing database credentials with
-team collaboration features.
-"""
-
-import os
-from pathlib import Path
-
-import uvicorn
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.exception_handlers import http_exception_handler
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from loguru import logger
-from rich.console import Console
-from rich.panel import Panel  # Add this import
-from rich.traceback import install as install_rich_traceback
-
-from dbcreds import __version__
-from dbcreds.core.exceptions import CredentialError
-from dbcreds.core.manager import CredentialManager
-from dbcreds.web.errors import web_error_handler
-from datetime import datetime
-from dbcreds.core.models import DatabaseType
-import json
-# Install rich traceback handler
-install_rich_traceback(show_locals=True)
-
-# Create console for startup messages
-console = Console()
-
-# Create FastAPI app
-app = FastAPI(
-    title="dbcreds Web",
-    description="Database Credentials Management",
-    version=__version__,
-)
-
-# Setup templates
-templates_dir = Path(__file__).parent / "templates"
-templates = Jinja2Templates(directory=str(templates_dir))
-
-# Mount static files
-static_dir = Path(__file__).parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
-
-# Exception handlers
-@app.exception_handler(CredentialError)
-async def credential_error_handler(request: Request, exc: CredentialError):
-    """Handle credential errors."""
-    return web_error_handler.get_error_response(request, exc)
-
-
-@app.exception_handler(Exception)
-async def general_exception_handler(request: Request, exc: Exception):
-    """Handle all other exceptions."""
-    return web_error_handler.get_error_response(request, exc)
-
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler_custom(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions."""
-    # Log HTTP exceptions with rich formatting
-    web_error_handler.log_error(exc, request)
-    return await http_exception_handler(request, exc)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on startup."""
-    console.print(Panel.fit(
-        f"[bold green]dbcreds Web Server v{__version__}[/bold green]\n"
-        f"[dim]Ready to manage your database credentials[/dim]",
-        title="Starting Up",
-        border_style="green"
-    ))
-
-
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    """Home page."""
-    try:
-        manager = CredentialManager()
-        environments = manager.list_environments()
-
-        return templates.TemplateResponse(
-            "index.html",
-            {
-                "request": request,
-                "title": "dbcreds",
-                "environments": environments,
-                "version": __version__,
-            },
-        )
-    except Exception as e:
-        # Errors will be caught by exception handlers
-        raise
-
-
-@app.get("/environments", response_class=HTMLResponse)
-async def list_environments(request: Request):
-    """List all environments (HTMX endpoint)."""
-    try:
-        manager = CredentialManager()
-        environments = manager.list_environments()
-
-        return templates.TemplateResponse(
-            "partials/environment_list.html",
-            {
-                "request": request,
-                "environments": environments,
-            },
-        )
-    except Exception as e:
-        # Log the actual error
-        console.print(f"[red]Error loading environments:[/red] {e}")
-        if os.getenv("DBCREDS_DEBUG"):
-            console.print_exception()
-        
-        # For HTMX requests, return a simple error partial
-        return HTMLResponse(
-            content=f'<div class="text-red-600 p-4">Error loading environments: {str(e)}</div>',
-            status_code=500
-        )
-@app.get("/settings", response_class=HTMLResponse)
-async def settings(request: Request):
-    """Settings page."""
-    try:
-        manager = CredentialManager()
-        
-        # Get backend information
-        backends_info = []
-        for backend in manager.backends:
-            backend_name = backend.__class__.__name__
-            backend_info = {
-                "name": backend_name.replace("Backend", ""),
-                "description": "",
-                "available": backend.is_available()
-            }
-            
-            # Add descriptions for known backends
-            if "Keyring" in backend_name:
-                backend_info["description"] = "System keyring (Keychain on macOS, Credential Manager on Windows)"
-            elif "Windows" in backend_name:
-                backend_info["description"] = "Windows Credential Manager"
-            elif "Environment" in backend_name:
-                backend_info["description"] = "Environment variables"
-            elif "Config" in backend_name:
-                backend_info["description"] = "JSON configuration files"
-            
-            backends_info.append(backend_info)
-
-        return templates.TemplateResponse(
-            "settings.html",
-            {
-                "request": request,
-                "title": "Settings - dbcreds",
-                "version": __version__,
-                "config_dir": manager.config_dir,
-                "backends": backends_info,
-            },
-        )
-    except Exception as e:
-        # Errors will be caught by exception handlers
-        raise
-
-
-@app.post("/environments", response_class=HTMLResponse)
-async def create_environment(request: Request):
-    """Create a new environment."""
-    try:
-        form_data = await request.form()
-        manager = CredentialManager()
-        
-        # Add the environment
-        env_name = form_data.get("name", "").lower()
-        db_type = DatabaseType(form_data.get("database_type"))
-        
-        manager.add_environment(
-            env_name,
-            db_type,
-            description=form_data.get("description", ""),
-            is_production=bool(form_data.get("is_production", False))
-        )
-        
-        # Set credentials
-        manager.set_credentials(
-            env_name,
-            host=form_data.get("host"),
-            port=int(form_data.get("port", 5432)),
-            database=form_data.get("database"),
-            username=form_data.get("username"),
-            password=form_data.get("password"),
-            password_expires_days=int(form_data.get("expires_days", 90))
-        )
-        
-        # Return updated environment list
-        environments = manager.list_environments()
-        return templates.TemplateResponse(
-            "partials/environment_list.html",
-            {"request": request, "environments": environments},
-        )
-    except Exception as e:
-        return HTMLResponse(
-            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
-            status_code=400
-        )
-
-
-@app.get("/environments/{env_name}/edit", response_class=HTMLResponse)
-async def edit_environment_form(request: Request, env_name: str):
-    """Get edit form for an environment."""
-    try:
-        manager = CredentialManager()
-        creds = manager.get_credentials(env_name, check_expiry=False)
-        env = next((e for e in manager.list_environments() if e.name == env_name), None)
-        
-        if not env:
-            raise HTTPException(status_code=404, detail="Environment not found")
-        
-        # Calculate days until expiry
-        days_left = creds.days_until_expiry()
-        
-        html = f"""
-        <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                    <div>
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                            Edit Environment: {env_name}
-                        </h3>
-                        <div class="mt-2">
-                            <form hx-put="/environments/{env_name}" hx-target="#environment-list" hx-swap="innerHTML">
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">
-                                            Connection Details
-                                        </label>
-                                        <div class="mt-1 text-sm text-gray-500">
-                                            Host: {creds.host}:{creds.port}<br>
-                                            Database: {creds.database}<br>
-                                            Username: {creds.username}<br>
-                                            Type: {env.database_type.value}
-                                        </div>
-                                    </div>                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">
-                                            Password Status
-                                        </label>                                        <div class="mt-1 text-sm">
-                                            {'''
-                                            <span class="text-red-600">Expired</span>
-                                            ''' if creds.is_password_expired() else f'''
-                                            <span class="text-green-600">{days_left} days remaining</span>
-                                            ''' if days_left is not None else f'''
-                                            <span class="text-orange-600">Will expire in 90 days from update date</span>
-                                            '''}
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                Last updated: {creds.password_updated_at.strftime('%Y-%m-%d')}
-                                                {f'''<br>Expires on: {creds.password_expires_at.strftime('%Y-%m-%d')}''' if creds.password_expires_at else ''}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="password" class="block text-sm font-medium text-gray-700">
-                                            New Password (leave blank to keep current)
-                                        </label>
-                                        <input type="password" name="password" id="password"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="password_updated_at" class="block text-sm font-medium text-gray-700">
-                                            Password Last Updated Date
-                                        </label>
-                                        <input type="date" name="password_updated_at" id="password_updated_at"
-                                               value="{creds.password_updated_at.strftime('%Y-%m-%d')}"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                        <p class="mt-1 text-xs text-gray-500">
-                                            Use this to adjust when the password was last updated.
-                                        </p>
-                                    </div>
-                                      <div>
-                                        <label for="expires_days" class="block text-sm font-medium text-gray-700">
-                                            Password Expiry (days)
-                                        </label>
-                                        <input type="number" name="expires_days" id="expires_days" 
-                                               value="{days_left if days_left is not None else 90}"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                </div>
-                                
-                                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                                    <button type="submit"
-                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
-                                        Update
-                                    </button>
-                                    <button type="button" onclick="document.getElementById('modal').innerHTML=''"
-                                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        """
-        
-        return HTMLResponse(content=html)
-    except Exception as e:
-        return HTMLResponse(
-            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
-            status_code=500
-        )
-
-
-@app.put("/environments/{env_name}", response_class=HTMLResponse)
-async def update_environment(request: Request, env_name: str):
-    """Update an environment."""
-    try:
-        form_data = await request.form()
-        manager = CredentialManager()
-        
-        # Get existing credentials
-        creds = manager.get_credentials(env_name, check_expiry=False)
-        
-        # Get the expires_days value
-        expires_days = int(form_data.get("expires_days", 90))
-        
-        # Check if password updated date was changed
-        new_update_date_str = form_data.get("password_updated_at", "").strip()
-        password_updated_at = None
-        if new_update_date_str:
-            from datetime import datetime
-            # Parse the date from the form
-            try:
-                password_updated_at = datetime.strptime(new_update_date_str, '%Y-%m-%d')
-            except ValueError:
-                return HTMLResponse(
-                    content='<div class="text-red-600 p-4">Error: Invalid date format</div>',
-                    status_code=400
-                )
-          # Update password or other fields if needed
-        new_password = form_data.get("password", "").strip()
-        # Always consider an update needed if expiry days are set
-        update_needed = new_password or password_updated_at or expires_days > 0
-        
-        if update_needed:
-            # We need to directly modify the credentials in the backend
-            if not new_password:
-                # If only changing the update date, reuse existing password
-                new_password = creds.password.get_secret_value()
-                
-            # Use the existing update date if not provided
-            if not password_updated_at:
-                password_updated_at = creds.password_updated_at
-            
-            # Create a new credentials object with updated fields
-            manager.set_credentials(
-                env_name,
-                host=creds.host,
-                port=creds.port,
-                database=creds.database,
-                username=creds.username,
-                password=new_password,
-                # Always set the password_expires_days to ensure expiry is calculated
-                password_expires_days=expires_days
-            )
-            
-            # If we need to modify the update date, we need to access the backends
-            if password_updated_at:
-                # We need to update the password_updated_at field directly                for backend in manager.backends:
-                    if backend.is_available():
-                        try:
-                            # Get the raw credentials from the backend
-                            result = backend.get_credential(f"dbcreds:{env_name}")
-                            if result:
-                                username, password, metadata = result
-                                # Modify the password_updated_at field in metadata
-                                metadata["password_updated_at"] = password_updated_at.isoformat()
-                                # Always calculate the new expiry date
-                                from datetime import timedelta
-                                expires_at = password_updated_at + timedelta(days=expires_days)
-                                metadata["password_expires_at"] = expires_at.isoformat()
-                                # Save back to the backend using set_credential
-                                backend.set_credential(f"dbcreds:{env_name}", username, password, metadata)
-                                break                        except Exception as backend_error:
-                            logger.error(f"Error updating credentials in backend {backend.__class__.__name__}: {backend_error}")
-                            continue
-        
-        # Clear modal and refresh list
-        environments = manager.list_environments()
-        return templates.TemplateResponse(
-            "partials/environment_list.html",
-            {"request": request, "environments": environments},
-        )
-    except Exception as e:
-        return HTMLResponse(
-            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
-            status_code=400
-        )
-
-
-@app.post("/environments/{env_name}/test", response_class=HTMLResponse)
-async def test_environment(request: Request, env_name: str):
-    """Test environment connection."""
-    try:
-        manager = CredentialManager()
-        success = manager.test_connection(env_name)
-        
-        if success:
-            return HTMLResponse(
-                content='<div class="text-green-600 p-4">✓ Connection successful!</div>'
-            )
-        else:
-            return HTMLResponse(
-                content='<div class="text-red-600 p-4">✗ Connection failed!</div>'
-            )
-    except Exception as e:
-        return HTMLResponse(
-            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
-            status_code=500
-        )
-
-
-@app.get("/environments/new", response_class=HTMLResponse)
-async def new_environment_form(request: Request):
-    """New environment form (HTMX modal)."""
-    from dbcreds.core.models import DatabaseType
-    
-    # Default ports for each database type
-    default_ports = {
-        DatabaseType.POSTGRESQL: 5432,
-        DatabaseType.MYSQL: 3306,
-        DatabaseType.MSSQL: 1433,
-        DatabaseType.ORACLE: 1521,
-    }
-    
-    return HTMLResponse(content=f"""
-    <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                <div>
-                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                        Add New Environment
-                    </h3>
-                    <div class="mt-2">
-                        <form hx-post="/environments" hx-target="#environment-list" hx-swap="innerHTML">
-                            <div class="space-y-4">
-                                <div>
-                                    <label for="name" class="block text-sm font-medium text-gray-700">
-                                        Environment Name
-                                    </label>
-                                    <input type="text" name="name" id="name" required
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                           placeholder="dev, staging, prod">
-                                </div>
-                                
-                                <div>
-                                    <label for="database_type" class="block text-sm font-medium text-gray-700">
-                                        Database Type
-                                    </label>
-                                    <select name="database_type" id="database_type" required
-                                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            onchange="updateDefaultPort(this.value)">
-                                        {''.join(f'<option value="{dt.value}" data-port="{default_ports.get(dt, 5432)}">{dt.value.title()}</option>' for dt in DatabaseType)}
-                                    </select>
-                                </div>
-                                
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="host" class="block text-sm font-medium text-gray-700">
-                                            Server/Host
-                                        </label>
-                                        <input type="text" name="host" id="host" required
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                               placeholder="localhost">
-                                    </div>
-                                    
-                                    <div>
-                                        <label for="port" class="block text-sm font-medium text-gray-700">
-                                            Port
-                                        </label>
-                                        <input type="number" name="port" id="port" required value="5432"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label for="database" class="block text-sm font-medium text-gray-700">
-                                        Database Name
-                                    </label>
-                                    <input type="text" name="database" id="database" required
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                           placeholder="mydb">
-                                </div>
-                                
-                                <div>
-                                    <label for="username" class="block text-sm font-medium text-gray-700">
-                                        Username
-                                    </label>
-                                    <input type="text" name="username" id="username" required
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </div>
-                                
-                                <div>
-                                    <label for="password" class="block text-sm font-medium text-gray-700">
-                                        Password
-                                    </label>
-                                    <input type="password" name="password" id="password" required
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </div>
-                                
-                                <div>
-                                    <label for="expires_days" class="block text-sm font-medium text-gray-700">
-                                        Password Expiry (days)
-                                    </label>
-                                    <input type="number" name="expires_days" id="expires_days" value="90"
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                                </div>
-                                
-                                <div>
-                                    <label for="description" class="block text-sm font-medium text-gray-700">
-                                        Description
-                                    </label>
-                                    <input type="text" name="description" id="description"
-                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                           placeholder="Optional description">
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="is_production" id="is_production"
-                                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                    <label for="is_production" class="ml-2 block text-sm text-gray-900">
-                                        Production Environment
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                                <button type="submit"
-                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
-                                    Add Environment
-                                </button>
-                                <button type="button" onclick="document.getElementById('modal').innerHTML=''"
-                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function updateDefaultPort(dbType) {{
-            const select = document.getElementById('database_type');
-            const option = select.querySelector(`option[value="${{dbType}}"]`);
-            const port = option.getAttribute('data-port');
-            document.getElementById('port').value = port;
-        }}
-    </script>
-    """)
-@app.get("/api/environments/{env_name}/expiry")
-async def get_environment_expiry(env_name: str):
-    """Get password expiry information for an environment."""
-    try:
-        manager = CredentialManager()
-        creds = manager.get_credentials(env_name, check_expiry=False)
-          # Calculate days until expiry even if password_expires_at is not set
-        days_left = None
-        expiry_days = 90  # Default value
-
-        # Get the environment to check for explicit expiry settings
-        env = next((e for e in manager.list_environments() if e.name == env_name), None)
-
-        if creds.password_expires_at and creds.password_updated_at:
-            # Calculate the total expiry period in days
-            from datetime import timedelta
-            expiry_days = (creds.password_expires_at - creds.password_updated_at).days
-            days_left = creds.days_until_expiry()
-        elif creds.password_updated_at:
-            # If we have updated_at but no expires_at, let's calculate it
-            from datetime import timedelta, datetime
-            
-            # Default to 90 days if not specified otherwise
-            if env and hasattr(env, 'password_expires_days'):
-                expiry_days = env.password_expires_days
-            
-            # Calculate expiry
-            expires_at = creds.password_updated_at + timedelta(days=expiry_days)
-            delta = expires_at - datetime.utcnow()
-            days_left = delta.days if delta.days > 0 else 0
-            return {
-            "days_left": days_left,
-            "is_expired": creds.is_password_expired() if creds.password_expires_at else False,
-            "expires_at": creds.password_expires_at.isoformat() if creds.password_expires_at else None,
-            "updated_at": creds.password_updated_at.isoformat() if creds.password_updated_at else None,
-            "has_expiry": creds.password_expires_at is not None,
-            "expires_days": expiry_days  # Use calculated value
-        }
-    except Exception as e:
-        return {"error": str(e), "days_left": None, "is_expired": False, "updated_at": None, "has_expiry": False}
-
-def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
-    """Run the web server."""
-    console.print(f"\n[bold blue]Starting dbcreds web server[/bold blue]")
-    console.print(f"[green]➜[/green] Local:   http://localhost:{port}")
-    console.print(f"[green]➜[/green] Network: http://{host}:{port}\n")
-    
-    # Configure uvicorn with custom logging
-    log_config = uvicorn.config.LOGGING_CONFIG
-    log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s %(message)s"
-    log_config["formatters"]["access"]["fmt"] = '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'
-    
-    uvicorn.run(
-        "dbcreds.web.main:app" if reload else app,
-        host=host,
-        port=port,
-        reload=reload,
-        log_config=log_config,
-    )
-
-
-if __name__ == "__main__":
-    run_server(reload=True)
-```
-
-```python # dbcreds/web/errors.py
+```python # dbcreds\web\errors.py
 # dbcreds/web/errors.py
 """Error handling for the web interface."""
 
@@ -2436,11 +2079,1110 @@ class WebErrorHandler:
 web_error_handler = WebErrorHandler()
 ```
 
+```python # dbcreds\web\main.py
+# dbcreds/web/main.py
+"""
+FastAPI web application for dbcreds.
 
-## Utility Functions
+Provides a web interface for managing database credentials with
+team collaboration features.
+"""
+
+import os
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exception_handlers import http_exception_handler
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from loguru import logger
+from rich.console import Console
+from rich.panel import Panel
+from rich.traceback import install as install_rich_traceback
+
+from dbcreds import __version__
+from dbcreds.core.exceptions import CredentialError
+from dbcreds.core.manager import CredentialManager
+from dbcreds.core.models import DatabaseType
+from dbcreds.web.errors import web_error_handler
+
+# Install rich traceback handler
+install_rich_traceback(show_locals=True)
+
+# Create console for startup messages
+console = Console()
 
 
-```python # dbcreds/utils/shortcuts.py
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events."""
+    # Startup
+    console.print(
+        Panel.fit(
+            f"[bold green]dbcreds Web Server v{__version__}[/bold green]\n"
+            f"[dim]Ready to manage your database credentials[/dim]",
+            title="Starting Up",
+            border_style="green",
+        )
+    )
+    yield
+    # Shutdown (if needed)
+
+
+# Create FastAPI app
+app = FastAPI(
+    title="dbcreds Web",
+    description="Database Credentials Management",
+    version=__version__,
+    lifespan=lifespan,
+)
+
+# Add middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8000"],  # Configure for production
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=["localhost", "127.0.0.1"],  # Configure for production
+)
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=31536000; includeSubDomains"
+    )
+    return response
+
+
+# Setup templates
+templates_dir = Path(__file__).parent / "templates"
+templates = Jinja2Templates(directory=str(templates_dir))
+
+# Mount static files
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+
+# Exception handlers
+@app.exception_handler(CredentialError)
+async def credential_error_handler(request: Request, exc: CredentialError):
+    """Handle credential errors."""
+    return web_error_handler.get_error_response(request, exc)
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle all other exceptions."""
+    return web_error_handler.get_error_response(request, exc)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler_custom(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions."""
+    # Log HTTP exceptions with rich formatting
+    web_error_handler.log_error(exc, request)
+    return await http_exception_handler(request, exc)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    """Home page."""
+    try:
+        manager = CredentialManager()
+        environments = manager.list_environments()
+
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "title": "dbcreds",
+                "environments": environments,
+                "version": __version__,
+            },
+        )
+    except Exception as e:
+        logger.error(f"Error loading settings page: {e}")
+        return HTMLResponse(
+            content=f'<div class="text-red-600 p-4">Error loading settings: {str(e)}</div>',
+            status_code=500,
+        )
+
+
+# Updated create_environment function for dbcreds/web/main.py
+
+
+@app.post("/environments", response_class=HTMLResponse)
+async def create_environment(request: Request):
+    """Create a new environment."""
+    try:
+        form_data = await request.form()
+        manager = CredentialManager()
+
+        # Add the environment
+        env_name = form_data.get("name", "").lower()
+        db_type = DatabaseType(form_data.get("database_type"))
+
+        manager.add_environment(
+            env_name,
+            db_type,
+            description=form_data.get("description", ""),
+            is_production=bool(form_data.get("is_production", False)),
+        )
+
+        # Get password update date if provided
+        password_updated_at = None
+        password_updated_at_str = form_data.get("password_updated_at", "").strip()
+        if password_updated_at_str:
+            try:
+                # Parse as naive datetime then make timezone aware
+                naive_dt = datetime.strptime(password_updated_at_str, "%Y-%m-%d")
+                password_updated_at = naive_dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                # If parsing fails, use current date
+                password_updated_at = None
+
+        # Set credentials
+        expires_days = int(form_data.get("expires_days", 90))
+        manager.set_credentials(
+            env_name,
+            host=form_data.get("host"),
+            port=int(form_data.get("port", 5432)),
+            database=form_data.get("database"),
+            username=form_data.get("username"),
+            password=form_data.get("password"),
+            password_expires_days=expires_days,
+        )
+
+        # If a custom password update date was provided, update it
+        if password_updated_at:
+            # Update the password_updated_at field in the backend
+            for backend in manager.backends:
+                if backend.is_available():
+                    try:
+                        # Get the credential we just stored
+                        result = backend.get_credential(f"dbcreds:{env_name}")
+                        if result:
+                            username, password, metadata = result
+                            # Update the password_updated_at field
+                            metadata["password_updated_at"] = (
+                                password_updated_at.isoformat()
+                            )
+                            # Recalculate expiry based on the custom date
+                            if expires_days > 0:
+                                expires_at = password_updated_at + timedelta(
+                                    days=expires_days
+                                )
+                                metadata["password_expires_at"] = expires_at.isoformat()
+                            # Save back to the backend
+                            backend.set_credential(
+                                f"dbcreds:{env_name}", username, password, metadata
+                            )
+                            break
+                    except Exception as backend_error:
+                        logger.error(
+                            f"Error updating password date in backend: {backend_error}"
+                        )
+
+        # Get updated environments list
+        environments = manager.list_environments()
+
+        # Return response with environment list, close modal, and show success
+        return HTMLResponse(
+            content=f"""
+            <div id="environment-list" hx-swap-oob="true">
+                {
+                templates.get_template("partials/environment_list.html").render(
+                    request=request, environments=environments
+                )
+            }
+            </div>
+            <div id="modal" hx-swap-oob="true"></div>
+            <div id="notification-container" hx-swap-oob="afterbegin">
+                <div class="fixed top-4 right-4 z-50 animate-fade-in-down">
+                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="font-medium">Environment '{
+                env_name
+            }' created successfully!</span>
+                    </div>
+                </div>
+                <script>
+                    // Remove notification after 3 seconds
+                    setTimeout(() => {{
+                        const notification = document.querySelector('#notification-container > div');
+                        if (notification) {{
+                            notification.classList.add('animate-fade-out-up');
+                            setTimeout(() => notification.remove(), 300);
+                        }}
+                    }}, 3000);
+                    
+                    // Reload expiry info for all environments
+                    setTimeout(loadAllExpiryInfo, 100);
+                </script>
+            </div>
+            """
+        )
+    except Exception as e:
+        return HTMLResponse(
+            content=f"""
+            <div id="notification-container" hx-swap-oob="afterbegin">
+                <div class="fixed top-4 right-4 z-50 animate-fade-in-down">
+                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span class="font-medium">Error: {str(e)}</span>
+                    </div>
+                </div>
+                <script>
+                    // Remove notification after 5 seconds
+                    setTimeout(() => {{
+                        const notification = document.querySelector('#notification-container > div');
+                        if (notification) {{
+                            notification.classList.add('animate-fade-out-up');
+                            setTimeout(() => notification.remove(), 300);
+                        }}
+                    }}, 5000);
+                </script>
+            </div>
+            """,
+            status_code=400,
+        )
+
+
+@app.get("/environments", response_class=HTMLResponse)
+async def list_environments(request: Request):
+    """List all environments (HTMX endpoint)."""
+    try:
+        manager = CredentialManager()
+        environments = manager.list_environments()
+
+        return templates.TemplateResponse(
+            "partials/environment_list.html",
+            {
+                "request": request,
+                "environments": environments,
+            },
+        )
+    except Exception as e:
+        # Log the actual error
+        console.print(f"[red]Error loading environments:[/red] {e}")
+        if os.getenv("DBCREDS_DEBUG"):
+            console.print_exception()
+
+        # For HTMX requests, return a simple error partial
+        return HTMLResponse(
+            content=f'<div class="text-red-600 p-4">Error loading environments: {str(e)}</div>',
+            status_code=500,
+        )
+
+
+@app.get("/settings", response_class=HTMLResponse)
+async def settings(request: Request):
+    """Settings page."""
+    try:
+        manager = CredentialManager()
+
+        # Get backend information
+        backends_info = []
+        for backend in manager.backends:
+            backend_name = backend.__class__.__name__
+            backend_info = {
+                "name": backend_name.replace("Backend", ""),
+                "description": "",
+                "available": backend.is_available(),
+            }
+
+            # Add descriptions for known backends
+            if "Keyring" in backend_name:
+                backend_info["description"] = (
+                    "System keyring (Keychain on macOS, Credential Manager on Windows)"
+                )
+            elif "Windows" in backend_name:
+                backend_info["description"] = "Windows Credential Manager"
+            elif "Environment" in backend_name:
+                backend_info["description"] = "Environment variables"
+            elif "Config" in backend_name:
+                backend_info["description"] = "JSON configuration files"
+
+            backends_info.append(backend_info)
+
+        return templates.TemplateResponse(
+            "settings.html",
+            {
+                "request": request,
+                "title": "Settings - dbcreds",
+                "version": __version__,
+                "config_dir": manager.config_dir,
+                "backends": backends_info,
+            },
+        )
+    except Exception:
+        # Errors will be caught by exception handlers
+        raise
+
+
+@app.get("/environments/{env_name}/edit", response_class=HTMLResponse)
+async def edit_environment_form(request: Request, env_name: str):
+    """Get edit form for an environment."""
+    try:
+        manager = CredentialManager()
+        creds = manager.get_credentials(env_name, check_expiry=False)
+        env = next((e for e in manager.list_environments() if e.name == env_name), None)
+
+        if not env:
+            raise HTTPException(status_code=404, detail="Environment not found")
+
+        # Helper function to ensure timezone-aware datetime
+        def ensure_timezone_aware(dt):
+            if dt and dt.tzinfo is None:
+                return dt.replace(tzinfo=timezone.utc)
+            return dt
+
+        # Ensure datetimes are timezone-aware
+        password_updated_at = ensure_timezone_aware(creds.password_updated_at)
+        password_expires_at = ensure_timezone_aware(creds.password_expires_at)
+
+        # Calculate days until expiry
+        days_left = None
+        expiry_period = 90  # Default
+
+        if password_expires_at and password_updated_at:
+            # Calculate the total expiry period (not the days left)
+            expiry_period = (password_expires_at - password_updated_at).days
+            # Calculate days left
+            delta = password_expires_at - datetime.now(timezone.utc)
+            days_left = delta.days if delta.days > 0 else 0
+        elif password_updated_at:
+            # If we have updated_at but no expires_at, still show it will expire
+            # Calculate what the expiry date would be with default 90 days
+            theoretical_expires_at = password_updated_at + timedelta(days=expiry_period)
+            delta = theoretical_expires_at - datetime.now(timezone.utc)
+            days_left = delta.days if delta.days > 0 else 0
+
+        # Determine password status HTML
+        if password_expires_at is None and password_updated_at:
+            # Has update date but no expiry set - show calculated expiry
+            password_status_html = f"""
+            <span class="text-yellow-600">No expiry stored (would expire in {days_left} days)</span>
+            """
+        elif creds.is_password_expired():
+            password_status_html = """
+            <span class="text-red-600">Expired</span>
+            """
+        elif days_left is not None:
+            if days_left <= 7:
+                password_status_html = f"""
+                <span class="text-red-600">{days_left} days remaining</span>
+                """
+            elif days_left <= 30:
+                password_status_html = f"""
+                <span class="text-yellow-600">{days_left} days remaining</span>
+                """
+            else:
+                password_status_html = f"""
+                <span class="text-green-600">{days_left} days remaining</span>
+                """
+        else:
+            password_status_html = """
+            <span class="text-gray-600">No expiry set</span>
+            """
+
+        # Add details about dates
+        date_details_html = '<div class="text-xs text-gray-500 mt-1">'
+        if password_updated_at:
+            date_details_html += (
+                f"Last updated: {password_updated_at.strftime('%Y-%m-%d')}"
+            )
+        if password_expires_at:
+            date_details_html += (
+                f"<br>Expires on: {password_expires_at.strftime('%Y-%m-%d')}"
+            )
+        elif password_updated_at and expiry_period > 0:
+            theoretical_expires = password_updated_at + timedelta(days=expiry_period)
+            date_details_html += f"<br>Would expire on: {theoretical_expires.strftime('%Y-%m-%d')} (not stored)"
+        date_details_html += "</div>"
+
+        html = f"""
+        <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                            Edit Environment: {env_name}
+                        </h3>
+                        <div class="mt-2">
+                            <form hx-put="/environments/{env_name}" 
+                                hx-target="#environment-list" 
+                                hx-swap="innerHTML"
+                                hx-indicator="#form-indicator">
+                                <!-- Add hidden loading indicator -->
+                                <div id="form-indicator" class="htmx-indicator fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center rounded-lg" style="display:none;">
+                                    <div class="bg-white p-4 rounded-lg shadow-lg flex items-center space-x-3">
+                                        <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span class="text-gray-700">Updating environment...</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Connection Details
+                                        </label>
+                                        <div class="mt-1 text-sm text-gray-500">
+                                            Host: {creds.host}:{creds.port}<br>
+                                            Database: {creds.database}<br>
+                                            Username: {creds.username}<br>
+                                            Type: {env.database_type.value}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">
+                                            Password Status
+                                        </label>
+                                        <div class="mt-1 text-sm">
+                                            {password_status_html}
+                                            {date_details_html}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="password" class="block text-sm font-medium text-gray-700">
+                                            New Password (leave blank to keep current)
+                                        </label>
+                                        <input type="password" name="password" id="password"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="password_updated_at" class="block text-sm font-medium text-gray-700">
+                                            Password Last Updated Date
+                                        </label>
+                                        <input type="date" name="password_updated_at" id="password_updated_at"
+                                               value="{password_updated_at.strftime("%Y-%m-%d") if password_updated_at else ""}"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Use this to adjust when the password was last updated.
+                                        </p>
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="expires_days" class="block text-sm font-medium text-gray-700">
+                                            Password Expiry (days)
+                                        </label>
+                                        <input type="number" name="expires_days" id="expires_days" 
+                                               value="{expiry_period}"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Total days passwords are valid for (from update date).
+                                            {'''<br><span class="text-yellow-600">Note: Updating this will set the expiry date.</span>''' if password_expires_at is None else ""}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                    <button type="submit"
+                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                            onclick="this.disabled=true; this.form.submit();">
+                                        Update
+                                    </button>
+                                    <button type="button" 
+                                            onclick="document.getElementById('modal').innerHTML=''"
+                                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        """
+
+        return HTMLResponse(content=html)
+    except Exception as e:
+        return HTMLResponse(
+            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
+            status_code=500,
+        )
+
+
+# Updated update_environment function for dbcreds/web/main.py
+
+
+@app.put("/environments/{env_name}", response_class=HTMLResponse)
+async def update_environment(request: Request, env_name: str):
+    """Update an environment."""
+    try:
+        form_data = await request.form()
+        manager = CredentialManager()
+
+        # Get existing credentials
+        creds = manager.get_credentials(env_name, check_expiry=False)
+
+        # Get the expires_days value
+        expires_days = int(form_data.get("expires_days", 90))
+
+        # Check if password updated date was changed
+        new_update_date_str = form_data.get("password_updated_at", "").strip()
+        password_updated_at = None
+        if new_update_date_str:
+            # Parse the date from the form
+            try:
+                # Parse as naive datetime then make timezone aware
+                naive_dt = datetime.strptime(new_update_date_str, "%Y-%m-%d")
+                password_updated_at = naive_dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                return HTMLResponse(
+                    content='<div class="text-red-600 p-4">Error: Invalid date format</div>',
+                    status_code=400,
+                )
+
+        # Update password or other fields if needed
+        new_password = form_data.get("password", "").strip()
+
+        # If there's no password_expires_at but we have updated_at and expires_days,
+        # we should update to add the expiry
+        needs_expiry_fix = (
+            creds.password_expires_at is None
+            and (creds.password_updated_at or password_updated_at)
+            and expires_days > 0
+        )
+
+        # Always consider an update needed if expiry days are set or needs fixing
+        update_needed = (
+            new_password or password_updated_at or expires_days > 0 or needs_expiry_fix
+        )
+
+        if update_needed:
+            # We need to update the credentials
+            if not new_password:
+                # If only changing the update date or expiry, reuse existing password
+                new_password = creds.password.get_secret_value()
+
+            # Use the provided update date or existing one
+            if not password_updated_at:
+                password_updated_at = creds.password_updated_at
+                # Ensure it's timezone aware
+                if password_updated_at and password_updated_at.tzinfo is None:
+                    password_updated_at = password_updated_at.replace(
+                        tzinfo=timezone.utc
+                    )
+
+            # Always set credentials with expiry days to ensure expiry is calculated
+            manager.set_credentials(
+                env_name,
+                host=creds.host,
+                port=creds.port,
+                database=creds.database,
+                username=creds.username,
+                password=new_password,
+                password_expires_days=expires_days if expires_days > 0 else None,
+            )
+
+            # If we need to modify the update date, update it in the backend
+            if password_updated_at and password_updated_at != creds.password_updated_at:
+                # We need to update the password_updated_at field directly
+                for backend in manager.backends:
+                    if backend.is_available():
+                        try:
+                            # Get the raw credentials from the backend
+                            result = backend.get_credential(f"dbcreds:{env_name}")
+                            if result:
+                                username, password, metadata = result
+                                # Update the password_updated_at field in metadata
+                                metadata["password_updated_at"] = (
+                                    password_updated_at.isoformat()
+                                )
+                                # Always calculate the new expiry date if expires_days is set
+                                if expires_days > 0:
+                                    expires_at = password_updated_at + timedelta(
+                                        days=expires_days
+                                    )
+                                    metadata["password_expires_at"] = (
+                                        expires_at.isoformat()
+                                    )
+                                # Save back to the backend
+                                backend.set_credential(
+                                    f"dbcreds:{env_name}", username, password, metadata
+                                )
+                                break
+                        except Exception as backend_error:
+                            logger.error(
+                                f"Error updating credentials in backend {backend.__class__.__name__}: {backend_error}"
+                            )
+                            continue
+
+            # Log what we did
+            logger.info(
+                f"Updated environment {env_name}: password_changed={bool(form_data.get('password'))}, "
+                f"date_updated={bool(password_updated_at != creds.password_updated_at)}, "
+                f"expiry_fixed={needs_expiry_fix}"
+            )
+
+        # Get updated environments list
+        environments = manager.list_environments()
+
+        # Return response with environment list and trigger events
+        return HTMLResponse(
+            content=f"""
+            <div id="environment-list" hx-swap-oob="true">
+                {
+                templates.get_template("partials/environment_list.html").render(
+                    request=request, environments=environments
+                )
+            }
+            </div>
+            <div id="modal" hx-swap-oob="true"></div>
+            <div id="notification-container" hx-swap-oob="afterbegin">
+                <div class="fixed top-4 right-4 z-50 animate-fade-in-down">
+                    <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="font-medium">Environment '{
+                env_name
+            }' updated successfully!</span>
+                    </div>
+                </div>
+                <script>
+                    // Remove notification after 3 seconds
+                    setTimeout(() => {{
+                        const notification = document.querySelector('#notification-container > div');
+                        if (notification) {{
+                            notification.classList.add('animate-fade-out-up');
+                            setTimeout(() => notification.remove(), 300);
+                        }}
+                    }}, 3000);
+                    
+                    // Reload expiry info for the updated environment
+                    setTimeout(() => loadExpiryInfo('{env_name}'), 100);
+                </script>
+            </div>
+            """
+        )
+    except Exception as e:
+        logger.error(f"Error updating environment {env_name}: {e}")
+        return HTMLResponse(
+            content=f"""
+            <div class="text-red-600 p-4">Error: {str(e)}</div>
+            <div id="notification-container" hx-swap-oob="afterbegin">
+                <div class="fixed top-4 right-4 z-50 animate-fade-in-down">
+                    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                        <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span class="font-medium">Error updating environment: {str(e)}</span>
+                    </div>
+                </div>
+                <script>
+                    // Remove notification after 5 seconds
+                    setTimeout(() => {{
+                        const notification = document.querySelector('#notification-container > div');
+                        if (notification) {{
+                            notification.classList.add('animate-fade-out-up');
+                            setTimeout(() => notification.remove(), 300);
+                        }}
+                    }}, 5000);
+                </script>
+            </div>
+            """,
+            status_code=400,
+        )
+
+
+@app.post("/environments/{env_name}/test", response_class=HTMLResponse)
+async def test_environment(request: Request, env_name: str):
+    """Test environment connection."""
+    try:
+        manager = CredentialManager()
+        success = manager.test_connection(env_name)
+
+        if success:
+            return HTMLResponse(
+                content='<div class="text-green-600 p-4">✓ Connection successful!</div>'
+            )
+        else:
+            return HTMLResponse(
+                content='<div class="text-red-600 p-4">✗ Connection failed!</div>'
+            )
+    except Exception as e:
+        return HTMLResponse(
+            content=f'<div class="text-red-600 p-4">Error: {str(e)}</div>',
+            status_code=500,
+        )
+
+
+@app.get("/environments/new", response_class=HTMLResponse)
+async def new_environment_form(request: Request):
+    """New environment form (HTMX modal)."""
+    # Default ports for each database type
+    default_ports = {
+        DatabaseType.POSTGRESQL: 5432,
+        DatabaseType.MYSQL: 3306,
+        DatabaseType.MSSQL: 1433,
+        DatabaseType.ORACLE: 1521,
+    }
+
+    # Get today's date for the default
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    return HTMLResponse(
+        content=f"""
+    <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        Add New Environment
+                    </h3>
+                    <div class="mt-2">
+                        <form hx-post="/environments" 
+                              hx-target="#environment-list" 
+                              hx-swap="innerHTML"
+                              hx-indicator="#form-indicator">
+                            <!-- Loading indicator -->
+                            <div id="form-indicator" class="htmx-indicator fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center rounded-lg" style="display:none;">
+                                <div class="bg-white p-4 rounded-lg shadow-lg flex items-center space-x-3">
+                                    <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-gray-700">Creating environment...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700">
+                                        Environment Name
+                                    </label>
+                                    <input type="text" name="name" id="name" required
+                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                           placeholder="dev, staging, prod">
+                                </div>
+                                
+                                <div>
+                                    <label for="database_type" class="block text-sm font-medium text-gray-700">
+                                        Database Type
+                                    </label>
+                                    <select name="database_type" id="database_type" required
+                                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            onchange="updateDefaultPort(this.value)">
+                                        {"".join(f'<option value="{dt.value}" data-port="{default_ports.get(dt, 5432)}">{dt.value.title()}</option>' for dt in DatabaseType)}
+                                    </select>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="host" class="block text-sm font-medium text-gray-700">
+                                            Server/Host
+                                        </label>
+                                        <input type="text" name="host" id="host" required
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                               placeholder="localhost">
+                                    </div>
+                                    
+                                    <div>
+                                        <label for="port" class="block text-sm font-medium text-gray-700">
+                                            Port
+                                        </label>
+                                        <input type="number" name="port" id="port" required value="5432"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="database" class="block text-sm font-medium text-gray-700">
+                                        Database Name
+                                    </label>
+                                    <input type="text" name="database" id="database" required
+                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                           placeholder="mydb">
+                                </div>
+                                
+                                <div>
+                                    <label for="username" class="block text-sm font-medium text-gray-700">
+                                        Username
+                                    </label>
+                                    <input type="text" name="username" id="username" required
+                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                
+                                <div>
+                                    <label for="password" class="block text-sm font-medium text-gray-700">
+                                        Password
+                                    </label>
+                                    <input type="password" name="password" id="password" required
+                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                
+                                <!-- Separator line for password management section -->
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-3">Password Management</h4>
+                                    
+                                    <div>
+                                        <label for="password_updated_at" class="block text-sm font-medium text-gray-700">
+                                            Password Last Updated Date
+                                        </label>
+                                        <input type="date" name="password_updated_at" id="password_updated_at"
+                                               value="{today}"
+                                               max="{today}"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                               onchange="updateExpiryPreview()">
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            When was this password last set or changed? Defaults to today.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="mt-4">
+                                        <label for="expires_days" class="block text-sm font-medium text-gray-700">
+                                            Password Expiry Period (days)
+                                        </label>
+                                        <input type="number" name="expires_days" id="expires_days" value="90" min="0"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                               oninput="updateExpiryPreview()">
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            How many days until the password expires from the update date. Set to 0 to disable expiry.
+                                        </p>
+                                        <p id="expiry-preview" class="mt-1 text-xs"></p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">
+                                        Description
+                                    </label>
+                                    <input type="text" name="description" id="description"
+                                           class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                           placeholder="Optional description">
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="is_production" id="is_production"
+                                           class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                    <label for="is_production" class="ml-2 block text-sm text-gray-900">
+                                        Production Environment
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                                <button type="submit"
+                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
+                                    Add Environment
+                                </button>
+                                <button type="button" onclick="document.getElementById('modal').innerHTML=''"
+                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function updateDefaultPort(dbType) {{
+            const select = document.getElementById('database_type');
+            const option = select.querySelector(`option[value="${{dbType}}"]`);
+            const port = option.getAttribute('data-port');
+            document.getElementById('port').value = port;
+        }}
+        
+        function updateExpiryPreview() {{
+            const updateDateInput = document.getElementById('password_updated_at');
+            const expireDaysInput = document.getElementById('expires_days');
+            
+            const updateDate = updateDateInput.value;
+            const expireDays = parseInt(expireDaysInput.value) || 0;
+            
+            if (updateDate && expireDays > 0) {{
+                const date = new Date(updateDate + 'T00:00:00Z');
+                date.setDate(date.getDate() + expireDays);
+                
+                const expiryDate = date.toLocaleDateString('en-US', {{
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }});
+                
+                // Check if already expired
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const daysUntilExpiry = Math.floor((date - today) / (1000 * 60 * 60 * 24));
+                
+                let message = `Password will expire on ${{expiryDate}}`;
+                let className = 'text-gray-600';
+                
+                if (daysUntilExpiry < 0) {{
+                    message = `Password would have expired on ${{expiryDate}} (${{Math.abs(daysUntilExpiry)}} days ago)`;
+                    className = 'text-red-600';
+                }} else if (daysUntilExpiry === 0) {{
+                    message = `Password expires today!`;
+                    className = 'text-red-600 font-medium';
+                }} else if (daysUntilExpiry <= 7) {{
+                    message = `Password will expire on ${{expiryDate}} (in ${{daysUntilExpiry}} days)`;
+                    className = 'text-red-600';
+                }} else if (daysUntilExpiry <= 30) {{
+                    message = `Password will expire on ${{expiryDate}} (in ${{daysUntilExpiry}} days)`;
+                    className = 'text-yellow-600';
+                }} else {{
+                    message = `Password will expire on ${{expiryDate}} (in ${{daysUntilExpiry}} days)`;
+                    className = 'text-green-600';
+                }}
+                
+                // Update preview
+                const preview = document.getElementById('expiry-preview');
+                preview.className = `mt-1 text-xs ${{className}}`;
+                preview.textContent = message;
+            }} else if (expireDays === 0) {{
+                const preview = document.getElementById('expiry-preview');
+                preview.className = 'mt-1 text-xs text-blue-600';
+                preview.textContent = 'Password expiry tracking disabled';
+            }} else {{
+                // Clear preview
+                const preview = document.getElementById('expiry-preview');
+                preview.textContent = '';
+            }}
+        }}
+        
+        // Initial calculation
+        updateExpiryPreview();
+    </script>
+    """
+    )
+
+
+@app.get("/api/environments/{env_name}/expiry")
+async def get_environment_expiry(env_name: str):
+    """Get password expiry information for an environment."""
+    try:
+        manager = CredentialManager()
+        creds = manager.get_credentials(env_name, check_expiry=False)
+
+        # Helper function to ensure datetime is timezone-aware
+        def ensure_timezone_aware(dt):
+            if dt and dt.tzinfo is None:
+                # If naive, assume it was UTC
+                return dt.replace(tzinfo=timezone.utc)
+            return dt
+
+        # Calculate days until expiry
+        days_left = None
+        expiry_days = 90  # Default value
+
+        # Ensure all datetimes are timezone-aware
+        password_updated_at = ensure_timezone_aware(creds.password_updated_at)
+        password_expires_at = ensure_timezone_aware(creds.password_expires_at)
+
+        if password_expires_at and password_updated_at:
+            # We have both dates - calculate actual values
+            expiry_days = (password_expires_at - password_updated_at).days
+            # Calculate days left until expiry
+            now_utc = datetime.now(timezone.utc)
+            delta = password_expires_at - now_utc
+            days_left = max(0, delta.days)  # Use max to avoid negative days
+        elif password_updated_at:
+            # We have updated_at but no expires_at
+            # This means expiry is not being tracked, but we can calculate theoretical expiry
+            # Don't set days_left here - let the frontend calculate it if needed
+            pass
+
+        # Check if expired
+        is_expired = False
+        if password_expires_at:
+            is_expired = datetime.now(timezone.utc) > password_expires_at
+
+        return {
+            "days_left": days_left,
+            "is_expired": is_expired,
+            "expires_at": password_expires_at.isoformat()
+            if password_expires_at
+            else None,
+            "updated_at": password_updated_at.isoformat()
+            if password_updated_at
+            else None,
+            "has_expiry": password_expires_at
+            is not None,  # Only true if actually tracking expiry
+            "expires_days": expiry_days,  # Always return this so frontend can calculate
+        }
+    except Exception as e:
+        logger.error(f"Error getting expiry for {env_name}: {e}")
+        import traceback
+
+        logger.error(traceback.format_exc())
+        return {
+            "error": str(e),
+            "days_left": None,
+            "is_expired": False,
+            "updated_at": None,
+            "has_expiry": False,
+            "expires_days": 90,  # Default
+        }
+
+
+def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
+    """Run the web server."""
+    console.print("\n[bold blue]Starting dbcreds web server[/bold blue]")
+    console.print(f"[green]➜[/green] Local:   http://localhost:{port}")
+    console.print(f"[green]➜[/green] Network: http://{host}:{port}\n")
+
+    # Configure uvicorn with custom logging
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s %(message)s"
+    log_config["formatters"]["access"]["fmt"] = (
+        '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s'
+    )
+
+    uvicorn.run(
+        "dbcreds.web.main:app" if reload else app,
+        host=host,
+        port=port,
+        reload=reload,
+        log_config=log_config,
+    )
+
+
+if __name__ == "__main__":
+    run_server(reload=True)
+
+```
+
+
+## Utils
+
+
+```python # dbcreds\utils\shortcuts.py
 # dbcreds/utils/shortcuts.py
 """
 Convenience functions for common dbcreds operations.
@@ -2631,10 +3373,10 @@ async def get_async_engine(environment: str = "default", **kwargs) -> AsyncEngin
 ```
 
 
-## Command-Line Interface
+## CLI
 
 
-```python # dbcreds/cli.py
+```python # dbcreds\cli.py
 # dbcreds/cli.py
 """
 Command-line interface for dbcreds.
@@ -3078,7 +3820,42 @@ if __name__ == "__main__":
 
 ```
 
-```python # dbcreds/migrate.py
+```python # dbcreds\web\__main__.py
+# dbcreds/web/__main__.py
+"""Entry point for dbcreds-server command."""
+
+import sys
+
+import typer
+from rich.console import Console
+
+from dbcreds.web.main import run_server
+
+console = Console()
+
+
+def main():
+    """Run the dbcreds web server."""
+    try:
+        run_server()
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Server stopped by user[/yellow]")
+        sys.exit(0)
+    except Exception as e:
+        console.print(f"\n[bold red]Failed to start server:[/bold red] {e}")
+        console.print_exception()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+## Migrations
+
+
+```python # dbcreds\migrate.py
 # dbcreds/migrate.py
 """
 Migration script for importing existing PowerShell credentials into dbcreds.
@@ -3247,4 +4024,683 @@ def main(
 
 if __name__ == "__main__":
     typer.run(main)
+```
+
+
+## Templates
+
+
+```html # dbcreds\web\templates\base.html
+<!-- dbcreds/web/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Alpine.js for interactivity -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Animation for notifications */
+        @keyframes fade-in-down {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fade-out-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+        
+        .animate-fade-in-down {
+            animation: fade-in-down 0.3s ease-out;
+        }
+        
+        .animate-fade-out-up {
+            animation: fade-out-up 0.3s ease-out;
+        }
+    /* Add these styles to the <style> section in base.html */
+
+[x-cloak] { display: none !important; }
+
+/* HTMX loading indicator */
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: flex !important;
+}
+.htmx-request.htmx-indicator {
+    display: flex !important;
+}
+
+/* Animation for notifications */
+@keyframes fade-in-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-out-up {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.animate-fade-in-down {
+    animation: fade-in-down 0.3s ease-out;
+}
+
+.animate-fade-out-up {
+    animation: fade-out-up 0.3s ease-out;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Modal backdrop animation */
+.modal-backdrop-enter {
+    opacity: 0;
+}
+.modal-backdrop-enter-active {
+    opacity: 1;
+    transition: opacity 300ms ease-out;
+}
+
+/* Success/Error animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Disable form elements during submission */
+form.htmx-request input,
+form.htmx-request select,
+form.htmx-request textarea,
+form.htmx-request button {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+    </style>
+</head>
+<body class="h-full bg-gray-50">
+    <div class="min-h-full">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 justify-between">
+                    <div class="flex">
+                        <div class="flex flex-shrink-0 items-center">
+                            <h1 class="text-xl font-bold text-gray-900">dbcreds</h1>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="/" class="border-indigo-500 text-gray-900 inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium">
+                                Environments
+                            </a>
+                            <a href="/settings" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium">
+                                Settings
+                            </a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-500">v{{ version }}</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification container - notifications will be inserted here -->
+    <div id="notification-container"></div>
+<script>
+// Add this to base.html in a <script> tag
+
+function showNotification(message, type = 'success', duration = 3000) {
+    const container = document.getElementById('notification-container');
+    
+    // Define styles for different notification types
+    const styles = {
+        success: {
+            bg: 'bg-green-50',
+            border: 'border-green-200',
+            text: 'text-green-800',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>',
+            iconColor: 'text-green-600'
+        },
+        error: {
+            bg: 'bg-red-50',
+            border: 'border-red-200',
+            text: 'text-red-800',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>',
+            iconColor: 'text-red-600'
+        },
+        warning: {
+            bg: 'bg-yellow-50',
+            border: 'border-yellow-200',
+            text: 'text-yellow-800',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
+            iconColor: 'text-yellow-600'
+        },
+        info: {
+            bg: 'bg-blue-50',
+            border: 'border-blue-200',
+            text: 'text-blue-800',
+            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+            iconColor: 'text-blue-600'
+        }
+    };
+    
+    const style = styles[type] || styles.success;
+    
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 z-50 animate-fade-in-down';
+    notification.innerHTML = `
+        <div class="${style.bg} ${style.border} ${style.text} px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md">
+            <svg class="h-5 w-5 ${style.iconColor} flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                ${style.icon}
+            </svg>
+            <span class="font-medium">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto -mr-1 p-1 hover:opacity-75">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+    
+    // Add to container
+    container.insertBefore(notification, container.firstChild);
+    
+    // Auto-remove after duration
+    if (duration > 0) {
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.classList.add('animate-fade-out-up');
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, duration);
+    }
+}
+
+// HTMX event listeners for better integration
+document.body.addEventListener('htmx:afterRequest', function(event) {
+    // You can add custom handling here for successful requests
+    if (event.detail.successful && event.detail.xhr.status === 200) {
+        // Check if there's a custom success message in response headers
+        const successMessage = event.detail.xhr.getResponseHeader('X-Success-Message');
+        if (successMessage) {
+            showNotification(successMessage, 'success');
+        }
+    }
+});
+
+document.body.addEventListener('htmx:responseError', function(event) {
+    // Handle errors globally
+    const errorMessage = event.detail.xhr.getResponseHeader('X-Error-Message') || 'An error occurred';
+    showNotification(errorMessage, 'error', 5000);
+});
+    </script>
+</body>
+</html>
+```
+
+```html # dbcreds\web\templates\index.html
+<!-- # dbcreds/web/templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-2xl font-semibold leading-6 text-gray-900">Database Environments</h1>
+            <p class="mt-2 text-sm text-gray-700">
+                Manage your database credentials securely across different environments.
+            </p>
+        </div>
+        <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <button type="button" 
+                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    hx-get="/environments/new"
+                    hx-target="#modal">
+                Add environment
+            </button>
+        </div>
+    </div>
+    
+    <!-- Environment list -->
+    <div class="mt-8" id="environment-list" hx-get="/environments" hx-trigger="load">
+        <!-- Loading state -->
+        <div class="flex justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal container -->
+<div id="modal"></div>
+{% endblock %}
+
+
+# dbcreds/web/templates/partials/environment_list.html
+<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+    <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    Environment
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Type
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Description
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Status
+                </th>
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span class="sr-only">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            {% for env in environments %}
+            <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ env.name }}
+                    {% if env.is_production %}
+                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                        Production
+                    </span>
+                    {% endif %}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ env.database_type.value }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ env.description or "-" }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                        Active
+                    </span>
+                </td>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                    <span class="text-gray-300 mx-2">|</span>
+                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Test</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+```
+
+```html # dbcreds\web\templates\partials\environment_list.html
+<!-- dbcreds/web/templates/partials/environment_list.html -->
+{% if environments %}
+<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+    <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-50">
+            <tr>
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    Environment
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Type
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Description
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Password Expiry
+                </th>
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    Status
+                </th>
+                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span class="sr-only">Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            {% for env in environments %}
+            <tr>
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                    {{ env.name }}
+                    {% if env.is_production %}
+                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                        Production
+                    </span>
+                    {% endif %}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ env.database_type.value }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    {{ env.description or "-" }}
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500" id="expiry-{{ env.name }}">
+                    <span class="text-gray-400">Loading...</span>
+                </td>
+                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                        Active
+                    </span>
+                </td>
+                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                    <a href="#" 
+                       hx-get="/environments/{{ env.name }}/edit" 
+                       hx-target="#modal"
+                       class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                    <span class="text-gray-300 mx-2">|</span>
+                    <a href="#" 
+                       hx-post="/environments/{{ env.name }}/test" 
+                       hx-target="#test-result-{{ env.name }}"
+                       class="text-indigo-600 hover:text-indigo-900">Test</a>
+                    <div id="test-result-{{ env.name }}" class="mt-1"></div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Script to load expiry information -->
+<script>
+// Updated loadExpiryInfo function for environment_list.html
+
+function loadExpiryInfo(envName) {
+    fetch("/api/environments/" + envName + "/expiry")
+        .then(response => response.json())
+        .then(data => {
+            const element = document.getElementById("expiry-" + envName);
+            if (!element) return;
+            
+            if (data.error) {
+                console.error("Error fetching expiry data:", data.error);
+                element.innerHTML = "<span class=\"text-gray-400\">Unable to load</span>";
+                return;
+            }
+            
+            // Check if we have update date but no expiry date stored
+            if (data.updated_at && !data.expires_at && data.expires_days) {
+                // Calculate theoretical expiry
+                const updateDate = new Date(data.updated_at);
+                const theoreticalExpiry = new Date(updateDate);
+                theoreticalExpiry.setDate(theoreticalExpiry.getDate() + data.expires_days);
+                
+                const now = new Date();
+                const daysLeft = Math.floor((theoreticalExpiry - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft <= 0) {
+                    element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired (not tracked)</span>";
+                } else if (daysLeft <= 7) {
+                    element.innerHTML = "<span class=\"text-red-600\">" + daysLeft + " days left (not tracked)</span>";
+                } else if (daysLeft <= 30) {
+                    element.innerHTML = "<span class=\"text-yellow-600\">" + daysLeft + " days left (not tracked)</span>";
+                } else {
+                    element.innerHTML = "<span class=\"text-blue-600\">" + daysLeft + " days left (not tracked)</span>";
+                }
+                
+                element.title = "Password updated on: " + updateDate.toLocaleDateString() + 
+                              "\nWould expire on: " + theoreticalExpiry.toLocaleDateString() + 
+                              "\n(Expiry not being tracked - click Edit to enable)";
+            } else if (data.is_expired) {
+                element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired</span>";
+            } else if (data.days_left !== null) {
+                if (data.days_left <= 7) {
+                    element.innerHTML = "<span class=\"text-red-600\">" + data.days_left + " days left</span>";
+                } else if (data.days_left <= 30) {
+                    element.innerHTML = "<span class=\"text-yellow-600\">" + data.days_left + " days left</span>";
+                } else {
+                    element.innerHTML = "<span class=\"text-green-600\">" + data.days_left + " days left</span>";
+                }
+                
+                // Add expires date as tooltip/title
+                if (data.expires_at) {
+                    const expiresDate = new Date(data.expires_at);
+                    const formattedDate = expiresDate.toLocaleDateString();
+                    element.title = "Expires on: " + formattedDate;
+                }
+            } else if (data.updated_at) {
+                // If no expiry but we have update date, show as not tracked
+                const updatedDate = new Date(data.updated_at);
+                element.innerHTML = "<span class=\"text-gray-500\">Not tracked</span>";
+                element.title = "Password updated on: " + updatedDate.toLocaleDateString() + 
+                              "\nExpiry tracking not enabled";
+            } else {
+                element.innerHTML = "<span class=\"text-gray-400\">No expiry set</span>";
+            }
+        })
+        .catch(error => {
+            console.error("Error loading expiry:", error);
+            const element = document.getElementById("expiry-" + envName);
+            if (element) {
+                element.innerHTML = "<span class=\"text-gray-400\">Error loading</span>";
+            }
+        });
+}
+
+function loadAllExpiryInfo() {
+    {% for env in environments %}
+    loadExpiryInfo("{{ env.name }}");
+    {% endfor %}
+}
+
+// Initial load
+document.addEventListener("DOMContentLoaded", loadAllExpiryInfo);
+
+// For HTMX updates
+document.body.addEventListener("htmx:afterSwap", function(event) {
+    if (event.detail.target.id === "environment-list") {
+        setTimeout(loadAllExpiryInfo, 100);  // Small delay to ensure DOM is updated
+    }
+});
+
+// Call immediately in case DOM is already loaded
+loadAllExpiryInfo();
+</script>
+{% else %}
+<!-- Empty state -->
+<div class="py-6 text-center">
+    <p class="text-gray-500">No environments configured yet. Add one to get started.</p>
+</div>
+{% endif %}
+
+```
+
+```html # dbcreds\web\templates\settings.html
+<!-- dbcreds/web/templates/settings.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <div class="pb-5 border-b border-gray-200">
+        <h1 class="text-2xl font-semibold leading-6 text-gray-900">Settings</h1>
+        <p class="mt-2 text-sm text-gray-700">
+            Configure dbcreds behavior and preferences.
+        </p>
+    </div>
+
+    <!-- Settings sections -->
+    <div class="mt-6 space-y-8">
+        
+        <!-- General Settings -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">General Settings</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Configure general application behavior.</p>
+                </div>
+                <div class="mt-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="text-sm font-medium text-gray-900">Configuration Directory</label>
+                            <p class="text-sm text-gray-500">{{ config_dir }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="text-sm font-medium text-gray-900">Default Password Expiry</label>
+                            <p class="text-sm text-gray-500">90 days</p>
+                        </div>
+                        <button type="button" class="text-sm text-indigo-600 hover:text-indigo-500">
+                            Change
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backend Information -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Storage Backends</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Available credential storage backends on this system.</p>
+                </div>
+                <div class="mt-5">
+                    <ul class="divide-y divide-gray-200">
+                        {% for backend in backends %}
+                        <li class="py-3 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ backend.name }}</p>
+                                <p class="text-sm text-gray-500">{{ backend.description }}</p>
+                            </div>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if backend.available %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {% if backend.available %}Available{% else %}Not Available{% endif %}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Security</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Configure security-related settings.</p>
+                </div>
+                <div class="mt-5 space-y-4">
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="warn-expiry" name="warn-expiry" type="checkbox" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="warn-expiry" class="font-medium text-gray-700">Password expiry warnings</label>
+                            <p class="text-gray-500">Show warnings when passwords are about to expire.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex items-center h-5">
+                            <input id="auto-lock" name="auto-lock" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="auto-lock" class="font-medium text-gray-700">Auto-lock credentials</label>
+                            <p class="text-gray-500">Require re-authentication after period of inactivity.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export/Import -->
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Export & Import</h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Export environment configurations or import from backup.</p>
+                </div>
+                <div class="mt-5 flex space-x-3">
+                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                        </svg>
+                        Export Configuration
+                    </button>
+                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Import Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="bg-red-50 shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg font-medium leading-6 text-red-900">Danger Zone</h3>
+                <div class="mt-2 max-w-xl text-sm text-red-700">
+                    <p>Irreversible actions that affect all stored credentials.</p>
+                </div>
+                <div class="mt-5">
+                    <button type="button" class="inline-flex items-center justify-center px-4 py-2 border border-transparent font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
+                        Clear All Credentials
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
 ```

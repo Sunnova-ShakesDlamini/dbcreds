@@ -6,7 +6,7 @@ This module defines the data models used throughout dbcreds for type safety
 and validation.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
 
@@ -43,14 +43,28 @@ class Environment(BaseModel):
     database_type: DatabaseType
     description: Optional[str] = None
     is_production: bool = False
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:
         """Validate environment name."""
         return v.lower()
+
+    @field_validator("created_at", "updated_at", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v
 
 
 class DatabaseCredentials(BaseModel):
@@ -80,7 +94,9 @@ class DatabaseCredentials(BaseModel):
     password: SecretStr
     options: Dict[str, Any] = Field(default_factory=dict)
     ssl_mode: Optional[str] = None
-    password_updated_at: datetime = Field(default_factory=datetime.utcnow)
+    password_updated_at: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     password_expires_at: Optional[datetime] = None
 
     @field_validator("port")
@@ -98,7 +114,23 @@ class DatabaseCredentials(BaseModel):
             return defaults.get(db_type, v)
         return v
 
-    def get_connection_string(self, include_password: bool = True, driver: Optional[str] = None) -> str:
+    @field_validator("password_updated_at", "password_expires_at", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v
+
+    def get_connection_string(
+        self, include_password: bool = True, driver: Optional[str] = None
+    ) -> str:
         """
         Generate a connection string for the database.
 
@@ -117,20 +149,36 @@ class DatabaseCredentials(BaseModel):
         """
         # This would be implemented based on database type
         # For now, return a PostgreSQL example
-        password_part = f":{self.password.get_secret_value()}" if include_password else ""
+        password_part = (
+            f":{self.password.get_secret_value()}" if include_password else ""
+        )
         return f"postgresql://{self.username}{password_part}@{self.host}:{self.port}/{self.database}"
 
     def is_password_expired(self) -> bool:
         """Check if the password has expired."""
         if self.password_expires_at is None:
             return False
-        return datetime.utcnow() > self.password_expires_at
+
+        # Ensure both datetimes are timezone-aware for comparison
+        expires_at = self.password_expires_at
+        if expires_at.tzinfo is None:
+            # If naive, assume it was UTC
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        return datetime.now(timezone.utc) > expires_at
 
     def days_until_expiry(self) -> Optional[int]:
         """Get the number of days until password expiry."""
         if self.password_expires_at is None:
             return None
-        delta = self.password_expires_at - datetime.utcnow()
+
+        # Ensure both datetimes are timezone-aware for comparison
+        expires_at = self.password_expires_at
+        if expires_at.tzinfo is None:
+            # If naive, assume it was UTC
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+
+        delta = expires_at - datetime.now(timezone.utc)
         return max(0, delta.days)  # Return 0 if already expired
 
 
@@ -152,8 +200,22 @@ class CredentialMetadata(BaseModel):
 
     environment: str
     created_by: Optional[str] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_accessed: Optional[datetime] = None
     access_count: int = 0
     last_tested: Optional[datetime] = None
     last_test_success: Optional[bool] = None
+
+    @field_validator("created_at", "last_accessed", "last_tested", mode="before")
+    @classmethod
+    def ensure_timezone_aware(cls, v):
+        """Ensure datetime fields are timezone-aware."""
+        if v is None:
+            return v
+        if isinstance(v, str):
+            # If it's a string, let Pydantic parse it
+            return v
+        if isinstance(v, datetime) and v.tzinfo is None:
+            # If it's a naive datetime, assume UTC
+            return v.replace(tzinfo=timezone.utc)
+        return v

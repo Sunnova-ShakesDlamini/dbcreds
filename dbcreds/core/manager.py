@@ -7,7 +7,7 @@ credential storage and retrieval across different backends.
 """
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Type
 
 from loguru import logger
@@ -26,8 +26,8 @@ from dbcreds.core.models import DatabaseCredentials, DatabaseType, Environment
 
 # Conditional import for Windows
 if os.name == "nt":
-    from dbcreds.backends.windows import WindowsCredentialBackend
     from dbcreds.backends.legacy_windows import LegacyWindowsBackend
+    from dbcreds.backends.windows import WindowsCredentialBackend
 
 
 class CredentialManager:
@@ -65,7 +65,9 @@ class CredentialManager:
         self._initialize_backends()
         self._load_environments()
 
-        logger.debug(f"Initialized CredentialManager with {len(self.backends)} backends")
+        logger.debug(
+            f"Initialized CredentialManager with {len(self.backends)} backends"
+        )
 
     def _initialize_backends(self) -> None:
         """Initialize available credential backends in priority order."""
@@ -90,7 +92,9 @@ class CredentialManager:
                 logger.debug(f"Failed to initialize {backend_class.__name__}: {e}")
 
         if not self.backends:
-            logger.warning("No credential backends available, falling back to config file only")
+            logger.warning(
+                "No credential backends available, falling back to config file only"
+            )
             self.backends.append(ConfigFileBackend(self.config_dir))
 
     def _load_environments(self) -> None:
@@ -214,7 +218,9 @@ class CredentialManager:
         # Calculate password expiration
         password_expires_at = None
         if password_expires_days:
-            password_expires_at = datetime.utcnow() + timedelta(days=password_expires_days)
+            password_expires_at = datetime.now(timezone.utc) + timedelta(
+                days=password_expires_days
+            )
 
         # Create credentials object
         creds = DatabaseCredentials(
@@ -232,7 +238,9 @@ class CredentialManager:
         stored = False
         for backend in self.backends:
             try:
-                if backend.set_credential(f"dbcreds:{env_name}", username, password, creds.model_dump()):
+                if backend.set_credential(
+                    f"dbcreds:{env_name}", username, password, creds.model_dump()
+                ):
                     stored = True
                     logger.debug(f"Stored credentials in {backend.__class__.__name__}")
             except Exception as e:
@@ -244,7 +252,9 @@ class CredentialManager:
         logger.info(f"Stored credentials for environment: {env_name}")
         return creds
 
-    def get_credentials(self, environment: str, check_expiry: bool = True) -> DatabaseCredentials:
+    def get_credentials(
+        self, environment: str, check_expiry: bool = True
+    ) -> DatabaseCredentials:
         """
         Retrieve credentials for an environment.
 
@@ -285,12 +295,16 @@ class CredentialManager:
                             f"Password for environment '{environment}' has expired"
                         )
 
-                    logger.debug(f"Retrieved credentials from {backend.__class__.__name__}")
+                    logger.debug(
+                        f"Retrieved credentials from {backend.__class__.__name__}"
+                    )
                     return creds
             except Exception as e:
                 logger.debug(f"Failed to get from {backend.__class__.__name__}: {e}")
 
-        raise CredentialNotFoundError(f"No credentials found for environment '{environment}'")
+        raise CredentialNotFoundError(
+            f"No credentials found for environment '{environment}'"
+        )
 
     def list_environments(self) -> List[Environment]:
         """
@@ -346,4 +360,6 @@ class CredentialManager:
     def _save_environments(self) -> None:
         """Save environment configurations to disk."""
         config_backend = ConfigFileBackend(self.config_dir)
-        config_backend.save_environments([env.model_dump() for env in self.environments.values()])
+        config_backend.save_environments(
+            [env.model_dump() for env in self.environments.values()]
+        )

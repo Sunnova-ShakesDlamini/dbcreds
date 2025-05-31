@@ -1,0 +1,8 @@
+- 🔐 **Secure Storage**: Multiple backend support (Windows Credential Manager, macOS Keychain, Linux Secret Service)
+- 🌍 **Multi-Environment**: Manage credentials for development, staging, and production
+- 🚀 **Rich CLI**: Beautiful command-line interface with Rich and Typer
+- 🌐 **Web UI**: Optional FastAPI web interface with HTMX
+- 📊 **Multi-Database**: Support for PostgreSQL, MySQL, Oracle, SQL Server
+- 🔄 **Password Rotation**: Track password age and expiration
+- 📝 **Full Documentation**: Comprehensive docs with mkdocstrings
+- 🎯 **Type Safety**: Pydantic models for validation

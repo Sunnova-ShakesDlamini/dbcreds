@@ -17,6 +17,63 @@ import argparse
 from pathlib import Path
 
 
+def generate_directory_structure():
+    """Generate a markdown representation of the dbcreds directory structure."""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    dbcreds_dir = os.path.join(base_dir, "dbcreds")
+    
+    if not os.path.exists(dbcreds_dir):
+        return "Error: dbcreds directory not found"
+    
+    # Skip these directories and files when generating tree
+    skip_dirs = [".git", "__pycache__", ".pytest_cache", ".venv", ".idea", ".vscode"]
+    skip_extensions = [".pyc", ".pyo", ".pyd", ".so", ".dll"]
+    
+    def format_tree(directory, prefix="", is_last=True, level=0):
+        if os.path.basename(directory) in skip_dirs:
+            return ""
+            
+        # Limit to depth of 5 to prevent too much detail
+        if level > 5:
+            return ""
+            
+        output = []
+        basename = os.path.basename(directory)
+        
+        # Skip root directory name
+        if level > 0:
+            connector = "└── " if is_last else "├── "
+            output.append(f"{prefix}{connector}{basename}/")
+            prefix += "    " if is_last else "│   "
+        
+        items = [os.path.join(directory, item) for item in sorted(os.listdir(directory))]
+        dirs = [item for item in items if os.path.isdir(item)]
+        files = [item for item in items if os.path.isfile(item)]
+        
+        # Filter out unwanted directories
+        dirs = [d for d in dirs if os.path.basename(d) not in skip_dirs]
+        
+        # Filter out unwanted files
+        files = [f for f in files if not any(f.endswith(ext) for ext in skip_extensions)]
+        
+        # Process all files first
+        for i, file_path in enumerate(files):
+            file_name = os.path.basename(file_path)
+            is_file_last = (i == len(files) - 1) and len(dirs) == 0
+            connector = "└── " if is_file_last else "├── "
+            output.append(f"{prefix}{connector}{file_name}")
+        
+        # Then process directories
+        for i, dir_path in enumerate(dirs):
+            is_dir_last = i == len(dirs) - 1
+            output.append(format_tree(dir_path, prefix, is_dir_last, level + 1))
+        
+        return "\n".join(output)
+    
+    tree = format_tree(dbcreds_dir, level=0)
+    return f"```\ndbcreds/\n{tree}\n```"
+
+
 def collect_key_files(exclude_patterns=None):
     """
     Collect paths of key project files to include in documentation.
@@ -137,11 +194,16 @@ def generate_startup_md(output_path, exclude_patterns=None):
     """
     files = collect_key_files(exclude_patterns)
     content = []
-      # Add header
+    
+    # Add header
     from datetime import datetime
     timestamp = os.path.getmtime(files["PROJECT_CONFIG"][0]) if os.path.exists(files["PROJECT_CONFIG"][0]) else None
     date_str = "Unknown" if timestamp is None else datetime.fromtimestamp(Path(__file__).stat().st_mtime).strftime('%Y-%m-%d %H:%M:%S')
     content.append(f"# dbcreds Reference\n\nAuto-generated on {date_str}\n\nThis file contains the latest source code for the dbcreds library.\n")
+    
+    # Add directory structure as the first item after the header
+    content.append("## Directory Structure\n\nProject organization showing the key files and their relationships:\n")
+    content.append(generate_directory_structure())
     
     # Start with project config files
     for file_path in files["PROJECT_CONFIG"]:

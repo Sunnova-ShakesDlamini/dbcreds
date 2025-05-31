@@ -69,6 +69,8 @@
 
 <!-- Script to load expiry information -->
 <script>
+// Updated loadExpiryInfo function for environment_list.html
+
 function loadExpiryInfo(envName) {
     fetch("/api/environments/" + envName + "/expiry")
         .then(response => response.json())
@@ -82,7 +84,30 @@ function loadExpiryInfo(envName) {
                 return;
             }
             
-            if (data.is_expired) {
+            // Check if we have update date but no expiry date stored
+            if (data.updated_at && !data.expires_at && data.expires_days) {
+                // Calculate theoretical expiry
+                const updateDate = new Date(data.updated_at);
+                const theoreticalExpiry = new Date(updateDate);
+                theoreticalExpiry.setDate(theoreticalExpiry.getDate() + data.expires_days);
+                
+                const now = new Date();
+                const daysLeft = Math.floor((theoreticalExpiry - now) / (1000 * 60 * 60 * 24));
+                
+                if (daysLeft <= 0) {
+                    element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired (not tracked)</span>";
+                } else if (daysLeft <= 7) {
+                    element.innerHTML = "<span class=\"text-red-600\">" + daysLeft + " days left (not tracked)</span>";
+                } else if (daysLeft <= 30) {
+                    element.innerHTML = "<span class=\"text-yellow-600\">" + daysLeft + " days left (not tracked)</span>";
+                } else {
+                    element.innerHTML = "<span class=\"text-blue-600\">" + daysLeft + " days left (not tracked)</span>";
+                }
+                
+                element.title = "Password updated on: " + updateDate.toLocaleDateString() + 
+                              "\nWould expire on: " + theoreticalExpiry.toLocaleDateString() + 
+                              "\n(Expiry not being tracked - click Edit to enable)";
+            } else if (data.is_expired) {
                 element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired</span>";
             } else if (data.days_left !== null) {
                 if (data.days_left <= 7) {
@@ -100,11 +125,11 @@ function loadExpiryInfo(envName) {
                     element.title = "Expires on: " + formattedDate;
                 }
             } else if (data.updated_at) {
-                // If no expiry but we have update date, calculate from default expiry days
+                // If no expiry but we have update date, show as not tracked
                 const updatedDate = new Date(data.updated_at);
-                const expiryDays = data.expires_days || 90;
-                element.innerHTML = "<span class=\"text-orange-600\">" + expiryDays + " days from update</span>";
-                element.title = "Password updated on: " + updatedDate.toLocaleDateString();
+                element.innerHTML = "<span class=\"text-gray-500\">Not tracked</span>";
+                element.title = "Password updated on: " + updatedDate.toLocaleDateString() + 
+                              "\nExpiry tracking not enabled";
             } else {
                 element.innerHTML = "<span class=\"text-gray-400\">No expiry set</span>";
             }
