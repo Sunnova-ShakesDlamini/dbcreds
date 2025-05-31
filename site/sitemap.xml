@@ -1,119 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/api/backends/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/api/backends/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/api/cli/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/api/cli/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/api/core/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/api/core/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/api/web/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/api/web/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/examples/async/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/examples/async/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/examples/basic/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/examples/basic/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/examples/pandas/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/examples/pandas/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/examples/sqlalchemy/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/examples/sqlalchemy/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/getting-started/configuration/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/getting-started/configuration/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/getting-started/installation/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/getting-started/installation/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/getting-started/quickstart/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/getting-started/quickstart/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/backends/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/backends/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/cli/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/cli/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/migration/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/migration/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/python-api/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/python-api/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/rotation/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/rotation/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/guide/web-interface/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/guide/web-interface/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/cli-examples/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/cli-examples/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/development/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/development/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/features-list/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/features-list/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/installation-basic/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/installation-basic/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/installation-full/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/installation-full/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/installation-tabs/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/installation-tabs/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/key-features/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/key-features/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/python-examples/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/python-examples/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/includes/quickstart/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/includes/quickstart/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/security/backends/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/security/backends/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
     <url>
-         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/0.1/security/best-practices/</loc>
+         <loc>https://sunnova-shakesdlamini.github.io/dbcreds/security/best-practices/</loc>
          <lastmod>2025-05-31</lastmod>
     </url>
 </urlset>
