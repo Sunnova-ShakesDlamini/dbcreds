@@ -1,0 +1,270 @@
+/* docs/stylesheets/extra.css */
+
+/* Define custom color variables matching the logo */
+:root {
+  /* Logo colors */
+  --dbcreds-navy: #2b2d42;
+  --dbcreds-navy-dark: #1e1e3f;
+  --dbcreds-teal: #17a2b8;
+  --dbcreds-teal-light: #20c997;
+  --dbcreds-green: #28a745;
+  --dbcreds-green-light: #10b981;
+  --dbcreds-gradient: linear-gradient(135deg, var(--dbcreds-teal) 0%, var(--dbcreds-green) 100%);
+}
+
+/* Dark mode color scheme (slate) - matching logo background */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #17a2b8;
+  --md-primary-fg-color--light: #20c997;
+  --md-primary-fg-color--dark: #138496;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffde;
+  
+  --md-accent-fg-color: #10b981;
+  --md-accent-fg-color--transparent: #10b98120;
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: #ffffffde;
+  
+  /* Background colors */
+  --md-default-bg-color: #1e1e3f;
+  --md-default-bg-color--light: #2b2d42;
+  --md-default-bg-color--lighter: #3a3d5c;
+  
+  /* Code block colors */
+  --md-code-bg-color: #2b2d42;
+  --md-code-fg-color: #e8e8e8;
+  
+  /* Admonition colors with better contrast */
+  --md-admonition-bg-color: #2b2d42;
+}
+
+/* Light mode adjustments */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #17a2b8;
+  --md-primary-fg-color--light: #20c997;
+  --md-primary-fg-color--dark: #138496;
+  
+  --md-accent-fg-color: #28a745;
+  --md-accent-fg-color--transparent: #28a74520;
+}
+
+/* Header styling with gradient */
+.md-header {
+  background: var(--dbcreds-gradient);
+}
+
+[data-md-color-scheme="slate"] .md-header {
+  background: var(--dbcreds-navy-dark);
+  border-bottom: 2px solid var(--dbcreds-teal);
+}
+
+/* Navigation tabs with gradient accent */
+.md-tabs {
+  background-color: var(--dbcreds-navy);
+}
+
+.md-tabs__link--active {
+  position: relative;
+}
+
+.md-tabs__link--active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--dbcreds-gradient);
+}
+
+/* Hero section styling */
+.md-typeset .md-hero {
+  background: var(--dbcreds-gradient);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+/* Button styling with gradient */
+.md-button {
+  background: var(--dbcreds-gradient);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+}
+
+/* Code blocks with logo colors */
+.highlight {
+  border-left: 3px solid var(--dbcreds-teal);
+}
+
+/* Admonitions with gradient accents */
+.admonition {
+  border-left: 4px solid var(--dbcreds-teal);
+}
+
+.admonition.note {
+  border-left-color: var(--dbcreds-teal);
+}
+
+.admonition.tip {
+  border-left-color: var(--dbcreds-green);
+}
+
+.admonition.warning {
+  border-left-color: #ffc107;
+}
+
+.admonition.danger {
+  border-left-color: #dc3545;
+}
+
+/* Search styling */
+[data-md-color-scheme="slate"] .md-search__form {
+  background-color: var(--dbcreds-navy);
+  border: 1px solid var(--dbcreds-teal);
+}
+
+[data-md-color-scheme="slate"] .md-search__input {
+  color: white;
+}
+
+[data-md-color-scheme="slate"] .md-search__input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* TOC styling */
+.md-nav--secondary {
+  border-left: 2px solid var(--dbcreds-teal);
+}
+
+/* Link hover effects */
+.md-typeset a {
+  color: var(--dbcreds-teal);
+  transition: color 0.2s ease;
+}
+
+.md-typeset a:hover {
+  color: var(--dbcreds-green);
+}
+
+/* Footer gradient */
+.md-footer {
+  background: linear-gradient(to bottom, var(--dbcreds-navy-dark), #000000);
+}
+
+/* Card components for homepage */
+.feature-card {
+  background: var(--md-default-bg-color--light);
+  border: 1px solid var(--dbcreds-teal);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(23, 162, 184, 0.2);
+  border-color: var(--dbcreds-green);
+}
+
+/* Logo container styling */
+.md-header__button.md-logo {
+  transition: transform 0.3s ease;
+}
+
+.md-header__button.md-logo:hover {
+  transform: scale(1.1);
+}
+
+/* Logo styling with rounded corners */
+.logo-rounded {
+  border-radius: 20%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.logo-rounded:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+}
+
+/* Alternative: Circular logo */
+.logo-circle {
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* Alternative: Smooth rounded square */
+.logo-smooth {
+  border-radius: 25%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: var(--dbcreds-gradient);
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+/* Custom homepage hero */
+.hero-gradient {
+  background: var(--dbcreds-gradient);
+  background-size: 200% 200%;
+  animation: gradient-shift 10s ease infinite;
+  color: white;
+  padding: 4rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* API reference styling */
+.doc-class, .doc-function {
+  border-left: 3px solid var(--dbcreds-teal);
+  padding-left: 1rem;
+  margin: 1rem 0;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .hero-gradient {
+    padding: 2rem 1rem;
+  }
+}
+
+/* Terminal/console styling */
+.language-console .highlight {
+  background: #000000;
+  border-left-color: var(--dbcreds-green);
+}
+
+/* Beautiful scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--md-default-bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dbcreds-teal);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dbcreds-green);
+}
