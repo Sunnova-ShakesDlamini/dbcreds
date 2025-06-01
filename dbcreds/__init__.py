@@ -19,6 +19,7 @@ from dbcreds.utils.shortcuts import (
     get_async_engine,
     get_connection,
     get_connection_string,
+    get_connection_string_fast,  
     get_credentials,
     get_engine,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "get_async_engine",
     "get_credentials",
     "get_connection_string",
+     "get_connection_string_fast",
 ]
 
 # Configure logger with rich handler
