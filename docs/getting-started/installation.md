@@ -8,26 +8,26 @@
 ## Install from GitHub
 
 ```bash
-pip install git+https://github.com/yourcompany/dbcreds.git
+pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds
 ```
 
 ## Install with extras
 
 ```bash
 # PostgreSQL only (default)
-pip install git+https://github.com/yourcompany/dbcreds.git
+pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds
 
 # With MySQL support
-pip install "git+https://github.com/yourcompany/dbcreds.git#egg=dbcreds[mysql]"
+pip install "git+https://github.com/Sunnova-ShakesDlamini/dbcreds#egg=dbcreds[mysql]"
 
 # With all databases
-pip install "git+https://github.com/yourcompany/dbcreds.git#egg=dbcreds[mysql,oracle,mssql]"
+pip install "git+https://github.com/Sunnova-ShakesDlamini/dbcreds#egg=dbcreds[mysql,oracle,mssql]"
 ```
 
 ## Development Installation
 
 ```bash
-git clone https://github.com/yourcompany/dbcreds.git
+git clone https://github.com/Sunnova-ShakesDlamini/dbcreds
 cd dbcreds
 uv venv
 uv pip install -e ".[dev]"

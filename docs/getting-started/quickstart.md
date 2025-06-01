@@ -5,7 +5,7 @@ Get started with dbcreds in just a few minutes!
 ## Installation
 
 ```bash
-pip install git+https://github.com/yourcompany/dbcreds.git
+pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds
 ```
 
 ## Initialize dbcreds
