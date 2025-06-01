@@ -8,6 +8,7 @@ Usage:
 
 import sys
 from pathlib import Path
+from typing import Optional  # Add this import!
 
 FAST_MODULE_CODE = '''"""
 Fast database credential access - standalone module.
@@ -208,7 +209,7 @@ def get_mssql_connection_string(environment: str) -> str:
     # Convert to SQL Server format
     if conn_string.startswith('postgresql://'):
         base = conn_string[13:]
-        return f'mssql+pyodbc://{base}?driver=ODBC+Driver+17+for+SQL+Server'
+        return f'mssql+pyodbc://{{base}}?driver=ODBC+Driver+17+for+SQL+Server'
     return conn_string
 
 
@@ -238,6 +239,9 @@ def export_fast_module(output_path: Optional[str] = None):
         output_path = "dbcreds_fast.py"
 
     output_file = Path(output_path)
+
+    # Create directory if it doesn't exist
+    output_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Format the code with metadata
     code = FAST_MODULE_CODE.format(
