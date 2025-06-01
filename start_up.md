@@ -1,6 +1,6 @@
 # dbcreds Reference
 
-Auto-generated on 2025-05-31 17:10:31
+Auto-generated on 2025-05-31 19:43:49
 
 
 This file contains the latest source code for the dbcreds library.
@@ -75,47 +75,23 @@ SOFTWARE.
 
 ```
 
-# dbcreds
+<p align="center">
+  <img src="docs/assets/images/logo.png" alt="dbcreds logo" width="128">
+</p>
 
-Professional database credentials management with security and team collaboration in mind.
+<h1 align="center">dbcreds</h1>
+
+<p align="center">
+  Professional database credentials management with security and team collaboration in mind.
+</p>
 
 ## Features
 
-- 🔐 **Secure Storage**: Multiple backend support (Windows Credential Manager, macOS Keychain, Linux Secret Service)
-- 🌍 **Multi-Environment**: Manage credentials for development, staging, and production
-- 🚀 **Rich CLI**: Beautiful command-line interface with Rich and Typer
-- 🌐 **Web UI**: Optional FastAPI web interface with HTMX
-- 📊 **Multi-Database**: Support for PostgreSQL, MySQL, Oracle, SQL Server
-- 🔄 **Password Rotation**: Track password age and expiration
-- 📝 **Full Documentation**: Comprehensive docs with mkdocstrings
-- 🎯 **Type Safety**: Pydantic models for validation
+--8<-- "docs/includes/features-list.md"
 
 ## Installation
 
-Install directly from GitHub using pip:
-
-```bash
-pip install git+https://github.com/yourcompany/dbcreds.git
-```
-
-Or using uv:
-
-```bash
-uv pip install git+https://github.com/yourcompany/dbcreds.git
-```
-
-For development with additional database support:
-
-```bash
-# PostgreSQL only (default)
-pip install git+https://github.com/yourcompany/dbcreds.git
-
-# With MySQL support
-pip install "git+https://github.com/yourcompany/dbcreds.git#egg=dbcreds[mysql]"
-
-# With all databases
-pip install "git+https://github.com/yourcompany/dbcreds.git#egg=dbcreds[mysql,oracle,mssql]"
-```
+--8<-- "docs/includes/installation-full.md"
 
 ## Quick Start
 
@@ -139,46 +115,11 @@ dbcreds add prod --type postgresql --server prod.db.com --port 5432 --database m
 
 ### 3. Use in Python
 
-```python
-from dbcreds import get_engine, get_connection
-
-# Get SQLAlchemy engine
-engine = get_engine("dev")
-
-# Get connection
-with get_connection("prod") as conn:
-    df = pd.read_sql("SELECT * FROM users LIMIT 10", conn)
-
-# Async support
-from dbcreds import get_async_engine
-
-async_engine = await get_async_engine("dev")
-```
+--8<-- "docs/includes/python-examples.md"
 
 ## CLI Usage
 
-```bash
-# List all environments
-dbcreds list
-
-# Show specific environment (without password)
-dbcreds show dev
-
-# Test connection
-dbcreds test dev
-
-# Update password
-dbcreds update dev --password
-
-# Remove environment
-dbcreds remove dev
-
-# Check password expiry
-dbcreds check
-
-# Export connection string
-dbcreds export dev --format uri
-```
+--8<-- "docs/includes/cli-examples.md"
 
 ## Web Interface
 
@@ -195,21 +136,7 @@ dbcreds stores configuration in `~/.dbcreds/config.json` and credentials in your
 
 ## Development
 
-```bash
-# Clone the repository
-git clone https://github.com/yourcompany/dbcreds.git
-cd dbcreds
-
-# Create virtual environment with uv
-uv venv
-uv pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Build documentation
-mkdocs serve
-```
+--8<-- "docs/includes/development.md"
 
 ## Security
 
@@ -292,8 +219,8 @@ dbcreds-migrate = "dbcreds.migrate:app"
 [project.urls]
 Homepage = "https://github.com/yourcompany/dbcreds"
 Documentation = "https://yourcompany.github.io/dbcreds"
-Repository = "https://github.com/yourcompany/dbcreds"
-Issues = "https://github.com/yourcompany/dbcreds/issues"
+Repository = "https://github.com/Sunnova-ShakesDlamini/dbcreds"
+Issues = "https://github.com/Sunnova-ShakesDlamini/dbcreds/issues"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
