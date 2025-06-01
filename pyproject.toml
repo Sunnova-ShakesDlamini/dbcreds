@@ -62,6 +62,7 @@ mssql = ["pyodbc>=5.0.0"]
 dbcreds = "dbcreds.cli:app"
 dbcreds-server = "dbcreds.web.__main__:main"
 dbcreds-migrate = "dbcreds.migrate:app"
+dbcreds-export-fast = "dbcreds.export_fast:main"
 
 [project.urls]
 Homepage = "https://github.com/yourcompany/dbcreds"
