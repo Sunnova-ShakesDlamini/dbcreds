@@ -1,4 +1,5 @@
 # dbcreds/utils/shortcuts.py
+# dbcreds/utils/shortcuts.py
 """
 Convenience functions for common dbcreds operations.
 
@@ -12,33 +13,27 @@ import os
 import ctypes
 import ctypes.wintypes
 import json
-from functools import lru_cache
 
-# Lazy imports
-_sqlalchemy = None
-_manager = None
-_CredentialError = None
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
+from dbcreds.core.exceptions import CredentialError
+from dbcreds.core.manager import CredentialManager
+from dbcreds.core.models import DatabaseCredentials, DatabaseType
 
-def _get_credential_error():
-    """Lazy load CredentialError."""
-    global _CredentialError
-    if _CredentialError is None:
-        from dbcreds.core.exceptions import CredentialError
-        _CredentialError = CredentialError
-    return _CredentialError
+# Global credential manager instance
+_manager: Optional[CredentialManager] = None
 
 
-def _get_manager():
+def _get_manager() -> CredentialManager:
     """Get or create the global credential manager."""
     global _manager
     if _manager is None:
-        from dbcreds.core.manager import CredentialManager
         _manager = CredentialManager()
     return _manager
 
 
-@lru_cache(maxsize=10)
 def get_connection_string_fast(environment: str = "default") -> str:
     """
     Get database connection string using fast, marimo-friendly method.
@@ -55,7 +50,7 @@ def get_connection_string_fast(environment: str = "default") -> str:
         Database connection URI
         
     Raises:
-        ValueError: If credentials not found
+        CredentialError: If credentials not found
         
     Examples:
         >>> # In a marimo notebook
@@ -73,7 +68,7 @@ def get_connection_string_fast(environment: str = "default") -> str:
         if conn_string:
             return conn_string
     
-    raise ValueError(
+    raise CredentialError(
         f"No credentials found for environment '{environment}'. "
         "Please ensure credentials are set in environment variables or Windows Credential Manager."
     )
@@ -205,7 +200,9 @@ def _read_windows_credential(target: str) -> Dict[str, Any]:
     return {}
 
 
-def get_credentials(environment: str = "default"):
+
+
+def get_credentials(environment: str = "default") -> DatabaseCredentials:
     """
     Get database credentials for an environment.
 
@@ -239,10 +236,6 @@ def get_connection_string(environment: str = "default", include_password: bool =
         >>> print(uri)
         'postgresql://user:pass@localhost:5432/mydb'
     """
-    # Try fast method first if we're in fast mode
-    if os.environ.get('DBCREDS_FAST_MODE', '').lower() == 'true':
-        return get_connection_string_fast(environment)
-    
     creds = get_credentials(environment)
     return creds.get_connection_string(include_password=include_password)
 
@@ -269,11 +262,8 @@ def get_connection(environment: str = "default", **kwargs):
     env = manager.environments.get(environment.lower())
 
     if not env:
-        raise _get_credential_error()(f"Environment '{environment}' not found")
+        raise CredentialError(f"Environment '{environment}' not found")
 
-    # Import DatabaseType only when needed
-    from dbcreds.core.models import DatabaseType
-    
     # Get appropriate connection based on database type
     if env.database_type == DatabaseType.POSTGRESQL:
         import psycopg2
@@ -313,7 +303,7 @@ def get_connection(environment: str = "default", **kwargs):
         raise NotImplementedError(f"Database type {env.database_type} not yet implemented")
 
 
-def get_engine(environment: str = "default", **kwargs):
+def get_engine(environment: str = "default", **kwargs) -> Engine:
     """
     Get a SQLAlchemy engine for an environment.
 
@@ -329,16 +319,11 @@ def get_engine(environment: str = "default", **kwargs):
         >>> with engine.connect() as conn:
         ...     result = conn.execute("SELECT 1")
     """
-    global _sqlalchemy
-    if _sqlalchemy is None:
-        from sqlalchemy import create_engine
-        _sqlalchemy = create_engine
-    
     conn_string = get_connection_string(environment)
-    return _sqlalchemy(conn_string, **kwargs)
+    return create_engine(conn_string, **kwargs)
 
 
-async def get_async_engine(environment: str = "default", **kwargs):
+async def get_async_engine(environment: str = "default", **kwargs) -> AsyncEngine:
     """
     Get an async SQLAlchemy engine for an environment.
 
@@ -354,18 +339,13 @@ async def get_async_engine(environment: str = "default", **kwargs):
         >>> async with engine.connect() as conn:
         ...     result = await conn.execute("SELECT 1")
     """
-    from sqlalchemy.ext.asyncio import create_async_engine
-    
     manager = _get_manager()
     creds = manager.get_credentials(environment)
     env = manager.environments.get(environment.lower())
 
     if not env:
-        raise _get_credential_error()(f"Environment '{environment}' not found")
+        raise CredentialError(f"Environment '{environment}' not found")
 
-    # Import DatabaseType only when needed
-    from dbcreds.core.models import DatabaseType
-    
     # Build async connection string
     if env.database_type == DatabaseType.POSTGRESQL:
         driver = "postgresql+asyncpg"
@@ -376,3 +356,4 @@ async def get_async_engine(environment: str = "default", **kwargs):
 
     conn_string = f"{driver}://{creds.username}:{creds.password.get_secret_value()}@{creds.host}:{creds.port}/{creds.database}"
     return create_async_engine(conn_string, **kwargs)
+

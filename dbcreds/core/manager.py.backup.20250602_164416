@@ -1,6 +1,6 @@
 # dbcreds/core/manager.py
 """
-Core credential manager implementation with lazy initialization.
+Core credential manager implementation.
 
 This module provides the main CredentialManager class that orchestrates
 credential storage and retrieval across different backends.
@@ -10,34 +10,29 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Type
 
-# Lazy imports to speed up module loading
-_logger = None
-_ValidationError = None
-_models_loaded = False
-_backends_loaded = False
+from loguru import logger
+from pydantic import ValidationError
 
+from dbcreds.backends.base import CredentialBackend
+from dbcreds.backends.config import ConfigFileBackend
+from dbcreds.backends.environment import EnvironmentBackend
+from dbcreds.backends.keyring import KeyringBackend
+from dbcreds.core.exceptions import (
+    CredentialError,
+    CredentialNotFoundError,
+    PasswordExpiredError,
+)
+from dbcreds.core.models import DatabaseCredentials, DatabaseType, Environment
 
-def _get_logger():
-    """Lazy load logger only when needed."""
-    global _logger
-    if _logger is None:
-        from loguru import logger
-        _logger = logger
-    return _logger
-
-
-def _load_models():
-    """Lazy load models."""
-    global _models_loaded, _ValidationError
-    if not _models_loaded:
-        from pydantic import ValidationError as _VE
-        _ValidationError = _VE
-        _models_loaded = True
+# Conditional import for Windows
+if os.name == "nt":
+    from dbcreds.backends.legacy_windows import LegacyWindowsBackend
+    from dbcreds.backends.windows import WindowsCredentialBackend
 
 
 class CredentialManager:
     """
-    Main credential management class with lazy initialization.
+    Main credential management class.
 
     Orchestrates credential storage and retrieval across multiple backends,
     manages environments, and handles password expiration.
@@ -53,110 +48,57 @@ class CredentialManager:
         >>> manager.set_credentials("dev", "localhost", 5432, "mydb", "user", "pass")
         >>> creds = manager.get_credentials("dev")
     """
-    
-    _instance = None
-    _initialized = False
-
-    def __new__(cls, config_dir: Optional[str] = None):
-        """Singleton pattern with lazy initialization."""
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
 
     def __init__(self, config_dir: Optional[str] = None):
         """
-        Initialize the credential manager with lazy loading.
+        Initialize the credential manager.
 
         Args:
             config_dir: Optional custom configuration directory. Defaults to ~/.dbcreds
         """
-        # Only initialize once
-        if self._initialized:
-            return
-
         self.config_dir = config_dir or os.path.expanduser("~/.dbcreds")
-        self.backends: List = []  # Avoid importing types
-        self.environments: Dict[str, object] = {}  # Avoid importing Environment
+        os.makedirs(self.config_dir, exist_ok=True)
 
-        # Don't do anything heavy yet!
-        self._initialized = True
-        self._backends_initialized = False
-        self._environments_loaded = False
+        self.backends: List[CredentialBackend] = []
+        self.environments: Dict[str, Environment] = {}
 
-    def _ensure_initialized(self):
-        """Initialize backends and environments on first real use."""
-        if not self._backends_initialized:
-            os.makedirs(self.config_dir, exist_ok=True)
-            self._initialize_backends()
-            self._backends_initialized = True
+        self._initialize_backends()
+        self._load_environments()
 
-        if not self._environments_loaded:
-            self._load_environments()
-            self._environments_loaded = True
+        logger.debug(
+            f"Initialized CredentialManager with {len(self.backends)} backends"
+        )
 
     def _initialize_backends(self) -> None:
         """Initialize available credential backends in priority order."""
-        # Import these only when actually initializing
-        from dbcreds.backends.base import CredentialBackend
-        
         backend_classes: List[Type[CredentialBackend]] = []
 
         # Platform-specific backends first
         if os.name == "nt":
-            try:
-                from dbcreds.backends.windows import WindowsCredentialBackend
-                backend_classes.append(WindowsCredentialBackend)
-            except ImportError:
-                pass
-            
-            try:
-                from dbcreds.backends.legacy_windows import LegacyWindowsBackend
-                backend_classes.append(LegacyWindowsBackend)
-            except ImportError:
-                pass
+            backend_classes.append(WindowsCredentialBackend)
+            # Add legacy backend for existing PowerShell credentials
+            backend_classes.append(LegacyWindowsBackend)
 
         # Cross-platform backends
-        try:
-            from dbcreds.backends.keyring import KeyringBackend
-            backend_classes.append(KeyringBackend)
-        except ImportError:
-            pass
-            
-        try:
-            from dbcreds.backends.environment import EnvironmentBackend
-            backend_classes.append(EnvironmentBackend)
-        except ImportError:
-            pass
-            
-        try:
-            from dbcreds.backends.config import ConfigFileBackend
-            backend_classes.append(ConfigFileBackend)
-        except ImportError:
-            pass
+        backend_classes.extend([KeyringBackend, EnvironmentBackend, ConfigFileBackend])
 
         for backend_class in backend_classes:
             try:
                 backend = backend_class()
                 if backend.is_available():
                     self.backends.append(backend)
-                    _get_logger().debug(f"Initialized backend: {backend.__class__.__name__}")
+                    logger.debug(f"Initialized backend: {backend.__class__.__name__}")
             except Exception as e:
-                _get_logger().debug(f"Failed to initialize {backend_class.__name__}: {e}")
+                logger.debug(f"Failed to initialize {backend_class.__name__}: {e}")
 
         if not self.backends:
-            _get_logger().warning(
+            logger.warning(
                 "No credential backends available, falling back to config file only"
             )
-            from dbcreds.backends.config import ConfigFileBackend
             self.backends.append(ConfigFileBackend(self.config_dir))
 
     def _load_environments(self) -> None:
         """Load environment configurations from disk."""
-        from dbcreds.backends.config import ConfigFileBackend
-        from dbcreds.core.models import Environment
-        
-        _load_models()
-        
         config_backend = ConfigFileBackend(self.config_dir)
         environments_data = config_backend.load_environments()
 
@@ -164,16 +106,16 @@ class CredentialManager:
             try:
                 env = Environment(**env_data)
                 self.environments[env.name] = env
-            except _ValidationError as e:
-                _get_logger().error(f"Invalid environment data: {e}")
+            except ValidationError as e:
+                logger.error(f"Invalid environment data: {e}")
 
     def add_environment(
         self,
         name: str,
-        database_type,  # Avoid importing DatabaseType
+        database_type: DatabaseType,
         description: Optional[str] = None,
         is_production: bool = False,
-    ):
+    ) -> Environment:
         """
         Add a new environment configuration.
 
@@ -192,11 +134,6 @@ class CredentialManager:
         Examples:
             >>> manager.add_environment("dev", DatabaseType.POSTGRESQL, "Development database")
         """
-        self._ensure_initialized()
-        
-        from dbcreds.core.exceptions import CredentialError
-        from dbcreds.core.models import Environment
-        
         if name.lower() in self.environments:
             raise CredentialError(f"Environment '{name}' already exists")
 
@@ -210,7 +147,7 @@ class CredentialManager:
         self.environments[env.name] = env
         self._save_environments()
 
-        _get_logger().info(f"Added environment: {env.name}")
+        logger.info(f"Added environment: {env.name}")
         return env
 
     def remove_environment(self, name: str) -> None:
@@ -223,10 +160,6 @@ class CredentialManager:
         Raises:
             CredentialNotFoundError: If environment doesn't exist
         """
-        self._ensure_initialized()
-        
-        from dbcreds.core.exceptions import CredentialNotFoundError
-        
         env_name = name.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{name}' not found")
@@ -236,12 +169,12 @@ class CredentialManager:
             try:
                 backend.delete_credential(f"dbcreds:{env_name}")
             except Exception as e:
-                _get_logger().debug(f"Failed to delete from {backend.__class__.__name__}: {e}")
+                logger.debug(f"Failed to delete from {backend.__class__.__name__}: {e}")
 
         del self.environments[env_name]
         self._save_environments()
 
-        _get_logger().info(f"Removed environment: {env_name}")
+        logger.info(f"Removed environment: {env_name}")
 
     def set_credentials(
         self,
@@ -253,7 +186,7 @@ class CredentialManager:
         password: str,
         password_expires_days: Optional[int] = 90,
         **options,
-    ):
+    ) -> DatabaseCredentials:
         """
         Store credentials for an environment.
 
@@ -276,11 +209,6 @@ class CredentialManager:
         Examples:
             >>> manager.set_credentials("dev", "localhost", 5432, "mydb", "user", "pass")
         """
-        self._ensure_initialized()
-        
-        from dbcreds.core.exceptions import CredentialNotFoundError, CredentialError
-        from dbcreds.core.models import DatabaseCredentials
-        
         env_name = environment.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{environment}' not found")
@@ -314,19 +242,19 @@ class CredentialManager:
                     f"dbcreds:{env_name}", username, password, creds.model_dump()
                 ):
                     stored = True
-                    _get_logger().debug(f"Stored credentials in {backend.__class__.__name__}")
+                    logger.debug(f"Stored credentials in {backend.__class__.__name__}")
             except Exception as e:
-                _get_logger().debug(f"Failed to store in {backend.__class__.__name__}: {e}")
+                logger.debug(f"Failed to store in {backend.__class__.__name__}: {e}")
 
         if not stored:
             raise CredentialError("Failed to store credentials in any backend")
 
-        _get_logger().info(f"Stored credentials for environment: {env_name}")
+        logger.info(f"Stored credentials for environment: {env_name}")
         return creds
 
     def get_credentials(
         self, environment: str, check_expiry: bool = True
-    ):
+    ) -> DatabaseCredentials:
         """
         Retrieve credentials for an environment.
 
@@ -345,11 +273,6 @@ class CredentialManager:
             >>> creds = manager.get_credentials("dev")
             >>> print(creds.host, creds.port)
         """
-        self._ensure_initialized()
-        
-        from dbcreds.core.exceptions import CredentialNotFoundError, PasswordExpiredError
-        from dbcreds.core.models import DatabaseCredentials
-        
         env_name = environment.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{environment}' not found")
@@ -372,18 +295,18 @@ class CredentialManager:
                             f"Password for environment '{environment}' has expired"
                         )
 
-                    _get_logger().debug(
+                    logger.debug(
                         f"Retrieved credentials from {backend.__class__.__name__}"
                     )
                     return creds
             except Exception as e:
-                _get_logger().debug(f"Failed to get from {backend.__class__.__name__}: {e}")
+                logger.debug(f"Failed to get from {backend.__class__.__name__}: {e}")
 
         raise CredentialNotFoundError(
             f"No credentials found for environment '{environment}'"
         )
 
-    def list_environments(self):
+    def list_environments(self) -> List[Environment]:
         """
         List all configured environments.
 
@@ -395,7 +318,6 @@ class CredentialManager:
             >>> for env in envs:
             ...     print(env.name, env.database_type)
         """
-        self._ensure_initialized()
         return list(self.environments.values())
 
     def test_connection(self, environment: str) -> bool:
@@ -412,10 +334,6 @@ class CredentialManager:
             >>> if manager.test_connection("dev"):
             ...     print("Connection successful!")
         """
-        self._ensure_initialized()
-        
-        from dbcreds.core.models import DatabaseType
-        
         try:
             creds = self.get_credentials(environment)
             env = self.environments[environment.lower()]
@@ -436,13 +354,11 @@ class CredentialManager:
             # Add other database types as needed
 
         except Exception as e:
-            _get_logger().error(f"Connection test failed for '{environment}': {e}")
+            logger.error(f"Connection test failed for '{environment}': {e}")
             return False
 
     def _save_environments(self) -> None:
         """Save environment configurations to disk."""
-        from dbcreds.backends.config import ConfigFileBackend
-        
         config_backend = ConfigFileBackend(self.config_dir)
         config_backend.save_environments(
             [env.model_dump() for env in self.environments.values()]
