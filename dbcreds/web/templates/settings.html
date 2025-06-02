@@ -14,7 +14,7 @@
     <div class="mt-6 space-y-8">
         
         <!-- General Settings -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">General Settings</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -32,7 +32,7 @@
                             <label class="text-sm font-medium text-gray-900">Default Password Expiry</label>
                             <p class="text-sm text-gray-500">90 days</p>
                         </div>
-                        <button type="button" class="text-sm text-indigo-600 hover:text-indigo-500">
+                        <button type="button" class="text-sm text-dbcreds-blue hover:text-blue-700">
                             Change
                         </button>
                     </div>
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Backend Information -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Storage Backends</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -55,7 +55,7 @@
                                 <p class="text-sm font-medium text-gray-900">{{ backend.name }}</p>
                                 <p class="text-sm text-gray-500">{{ backend.description }}</p>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if backend.available %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if backend.available %}badge-success{% else %}bg-gray-100 text-gray-800{% endif %}">
                                 {% if backend.available %}Available{% else %}Not Available{% endif %}
                             </span>
                         </li>
@@ -66,7 +66,7 @@
         </div>
 
         <!-- Security Settings -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Security</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -75,7 +75,8 @@
                 <div class="mt-5 space-y-4">
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input id="warn-expiry" name="warn-expiry" type="checkbox" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            <input id="warn-expiry" name="warn-expiry" type="checkbox" checked 
+                                   class="focus:ring-dbcreds-blue h-4 w-4 text-dbcreds-blue border-gray-300 rounded">
                         </div>
                         <div class="ml-3 text-sm">
                             <label for="warn-expiry" class="font-medium text-gray-700">Password expiry warnings</label>
@@ -84,7 +85,8 @@
                     </div>
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input id="auto-lock" name="auto-lock" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            <input id="auto-lock" name="auto-lock" type="checkbox" 
+                                   class="focus:ring-dbcreds-blue h-4 w-4 text-dbcreds-blue border-gray-300 rounded">
                         </div>
                         <div class="ml-3 text-sm">
                             <label for="auto-lock" class="font-medium text-gray-700">Auto-lock credentials</label>
@@ -96,21 +98,21 @@
         </div>
 
         <!-- Export/Import -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Export & Import</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
                     <p>Export environment configurations or import from backup.</p>
                 </div>
                 <div class="mt-5 flex space-x-3">
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button type="button" class="btn-secondary inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                         </svg>
                         Export Configuration
                     </button>
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button type="button" class="btn-secondary inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         Import Configuration
@@ -120,7 +122,7 @@
         </div>
 
         <!-- Danger Zone -->
-        <div class="bg-red-50 shadow sm:rounded-lg">
+        <div class="card bg-red-50 border-red-200">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-red-900">Danger Zone</h3>
                 <div class="mt-2 max-w-xl text-sm text-red-700">

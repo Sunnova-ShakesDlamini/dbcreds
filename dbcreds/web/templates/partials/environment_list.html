@@ -1,22 +1,22 @@
 <!-- dbcreds/web/templates/partials/environment_list.html -->
 {% if environments %}
-<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-    <table class="min-w-full divide-y divide-gray-300">
-        <thead class="bg-gray-50">
+<div class="overflow-hidden shadow-lg rounded-lg">
+    <table class="min-w-full">
+        <thead>
             <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">
                     Environment
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Type
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Description
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Password Expiry
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Status
                 </th>
                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -24,41 +24,55 @@
                 </th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
+        <tbody class="divide-y divide-gray-200">
             {% for env in environments %}
-            <tr>
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6">
                     {{ env.name }}
                     {% if env.is_production %}
-                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                    <span class="ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium badge-danger">
                         Production
                     </span>
                     {% endif %}
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ env.database_type.value }}
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                    <span class="badge badge-info">{{ env.database_type.value }}</span>
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
                     {{ env.description or "-" }}
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500" id="expiry-{{ env.name }}">
-                    <span class="text-gray-400">Loading...</span>
+                <td class="whitespace-nowrap px-3 py-4 text-sm" id="expiry-{{ env.name }}">
+                    <span class="inline-flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2 spinner" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Loading...
+                    </span>
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                    <span class="badge badge-success">
                         Active
                     </span>
                 </td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <a href="#" 
-                       hx-get="/environments/{{ env.name }}/edit" 
-                       hx-target="#modal"
-                       class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                    <span class="text-gray-300 mx-2">|</span>
-                    <a href="#" 
-                       hx-post="/environments/{{ env.name }}/test" 
-                       hx-target="#test-result-{{ env.name }}"
-                       class="text-indigo-600 hover:text-indigo-900">Test</a>
+                    <button hx-get="/environments/{{ env.name }}/edit" 
+                            hx-target="#modal"
+                            class="text-dbcreds-blue hover:text-blue-700 font-medium mr-3">
+                        Edit
+                    </button>
+                    <button hx-post="/environments/{{ env.name }}/test" 
+                            hx-target="#test-result-{{ env.name }}"
+                            hx-indicator="#test-indicator-{{ env.name }}"
+                            class="text-dbcreds-green hover:text-green-700 font-medium">
+                        Test
+                    </button>
+                    <span id="test-indicator-{{ env.name }}" class="htmx-indicator ml-2">
+                        <svg class="animate-spin h-4 w-4 inline spinner" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
                     <div id="test-result-{{ env.name }}" class="mt-1"></div>
                 </td>
             </tr>
@@ -67,10 +81,8 @@
     </table>
 </div>
 
-<!-- Script to load expiry information -->
 <script>
-// Updated loadExpiryInfo function for environment_list.html
-
+// Load expiry information with better error handling
 function loadExpiryInfo(envName) {
     fetch("/api/environments/" + envName + "/expiry")
         .then(response => response.json())
@@ -78,71 +90,40 @@ function loadExpiryInfo(envName) {
             const element = document.getElementById("expiry-" + envName);
             if (!element) return;
             
-            if (data.error) {
-                console.error("Error fetching expiry data:", data.error);
-                element.innerHTML = "<span class=\"text-gray-400\">Unable to load</span>";
-                return;
-            }
+            let html = '';
+            let badgeClass = '';
             
-            // Check if we have update date but no expiry date stored
-            if (data.updated_at && !data.expires_at && data.expires_days) {
-                // Calculate theoretical expiry
-                const updateDate = new Date(data.updated_at);
-                const theoreticalExpiry = new Date(updateDate);
-                theoreticalExpiry.setDate(theoreticalExpiry.getDate() + data.expires_days);
-                
-                const now = new Date();
-                const daysLeft = Math.floor((theoreticalExpiry - now) / (1000 * 60 * 60 * 24));
-                
-                if (daysLeft <= 0) {
-                    element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired (not tracked)</span>";
-                } else if (daysLeft <= 7) {
-                    element.innerHTML = "<span class=\"text-red-600\">" + daysLeft + " days left (not tracked)</span>";
-                } else if (daysLeft <= 30) {
-                    element.innerHTML = "<span class=\"text-yellow-600\">" + daysLeft + " days left (not tracked)</span>";
-                } else {
-                    element.innerHTML = "<span class=\"text-blue-600\">" + daysLeft + " days left (not tracked)</span>";
-                }
-                
-                element.title = "Password updated on: " + updateDate.toLocaleDateString() + 
-                              "\nWould expire on: " + theoreticalExpiry.toLocaleDateString() + 
-                              "\n(Expiry not being tracked - click Edit to enable)";
+            if (data.error) {
+                html = '<span class="badge bg-gray-500 text-white">Error</span>';
             } else if (data.is_expired) {
-                element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired</span>";
+                html = '<span class="badge badge-danger">Expired</span>';
             } else if (data.days_left !== null) {
                 if (data.days_left <= 7) {
-                    element.innerHTML = "<span class=\"text-red-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-danger';
                 } else if (data.days_left <= 30) {
-                    element.innerHTML = "<span class=\"text-yellow-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-warning';
                 } else {
-                    element.innerHTML = "<span class=\"text-green-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-success';
                 }
-                
-                // Add expires date as tooltip/title
-                if (data.expires_at) {
-                    const expiresDate = new Date(data.expires_at);
-                    const formattedDate = expiresDate.toLocaleDateString();
-                    element.title = "Expires on: " + formattedDate;
-                }
-            } else if (data.updated_at) {
-                // If no expiry but we have update date, show as not tracked
-                const updatedDate = new Date(data.updated_at);
-                element.innerHTML = "<span class=\"text-gray-500\">Not tracked</span>";
-                element.title = "Password updated on: " + updatedDate.toLocaleDateString() + 
-                              "\nExpiry tracking not enabled";
+                html = `<span class="badge ${badgeClass}">${data.days_left} days left</span>`;
+            } else if (data.updated_at && !data.has_expiry) {
+                html = '<span class="badge bg-gray-500 text-white">Not tracked</span>';
             } else {
-                element.innerHTML = "<span class=\"text-gray-400\">No expiry set</span>";
+                html = '<span class="badge bg-gray-500 text-white">No expiry</span>';
             }
+            
+            element.innerHTML = html;
         })
         .catch(error => {
             console.error("Error loading expiry:", error);
             const element = document.getElementById("expiry-" + envName);
             if (element) {
-                element.innerHTML = "<span class=\"text-gray-400\">Error loading</span>";
+                element.innerHTML = '<span class="badge bg-gray-500 text-white">Error</span>';
             }
         });
 }
 
+// Load all expiry info
 function loadAllExpiryInfo() {
     {% for env in environments %}
     loadExpiryInfo("{{ env.name }}");
@@ -151,20 +132,20 @@ function loadAllExpiryInfo() {
 
 // Initial load
 document.addEventListener("DOMContentLoaded", loadAllExpiryInfo);
-
-// For HTMX updates
-document.body.addEventListener("htmx:afterSwap", function(event) {
-    if (event.detail.target.id === "environment-list") {
-        setTimeout(loadAllExpiryInfo, 100);  // Small delay to ensure DOM is updated
-    }
-});
-
-// Call immediately in case DOM is already loaded
 loadAllExpiryInfo();
 </script>
 {% else %}
 <!-- Empty state -->
-<div class="py-6 text-center">
-    <p class="text-gray-500">No environments configured yet. Add one to get started.</p>
+<div class="card text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+    </svg>
+    <p class="text-gray-500 mb-4">No environments configured yet.</p>
+    <button type="button" 
+            class="btn-primary mx-auto"
+            hx-get="/environments/new"
+            hx-target="#modal">
+        Add Your First Environment
+    </button>
 </div>
 {% endif %}
