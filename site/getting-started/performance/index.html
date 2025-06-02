@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://sunnova-shakesdlamini.github.io/dbcreds/getting-started/configuration/">
+        <link rel="canonical" href="https://sunnova-shakesdlamini.github.io/dbcreds/getting-started/performance/">
       
       
-        <link rel="prev" href="../installation/">
+        <link rel="prev" href="../configuration/">
       
       
-        <link rel="next" href="../performance/">
+        <link rel="next" href="../../guide/cli/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -24,7 +24,7 @@
     
     
       
-        <title>Configuration - dbcreds</title>
+        <title>Performance & Lazy Loading - dbcreds</title>
       
     
     
@@ -90,7 +90,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#configuration" class="md-skip">
+        <a href="#performance-lazy-loading" class="md-skip">
           Skip to content
         </a>
       
@@ -125,7 +125,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Configuration
+              Performance & Lazy Loading
             
           </span>
         </div>
@@ -544,6 +544,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -561,7 +584,7 @@
   
   
   <span class="md-ellipsis">
-    Configuration
+    Performance & Lazy Loading
     
   </span>
   
@@ -574,7 +597,7 @@
   
   
   <span class="md-ellipsis">
-    Configuration
+    Performance & Lazy Loading
     
   </span>
   
@@ -597,15 +620,133 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configuration-directory" class="md-nav__link">
+  <a href="#fast-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration Directory
+      🚀 Fast Mode
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Fast Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic Detection
     </span>
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#manual-fast-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual Fast Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#direct-fast-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Direct Fast Access
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚡ How It Works
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="⚡ How It Works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lazy-module-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lazy Module Loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#credential-resolution-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      Credential Resolution Order
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Comparison
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-each-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 When to Use Each Mode
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 When to Use Each Mode">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#use-fast-mode-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      Use Fast Mode When:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-standard-mode-when" class="md-nav__link">
+    <span class="md-ellipsis">
+      Use Standard Mode When:
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔧 Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#environment-variables" class="md-nav__link">
     <span class="md-ellipsis">
       Environment Variables
@@ -613,11 +754,67 @@
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#programmatic-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programmatic Control
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#backend-configuration" class="md-nav__link">
+  <a href="#benchmarks" class="md-nav__link">
     <span class="md-ellipsis">
-      Backend Configuration
+      📊 Benchmarks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🛠️ Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#import-still-slow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import Still Slow?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fast-mode-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fast Mode Limitations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Debugging Performance
     </span>
   </a>
   
@@ -627,29 +824,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../performance/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Performance & Lazy Loading
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1322,15 +1496,195 @@
   
 
 
-<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
-<h2 id="configuration-directory">Configuration Directory<a class="headerlink" href="#configuration-directory" title="Permanent link">&para;</a></h2>
-<p>dbcreds stores its configuration in <code>~/.dbcreds/</code> by default.</p>
-<h2 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
-<p>You can override the configuration directory:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBCREDS_CONFIG_DIR</span><span class="o">=</span>/path/to/config
+<h1 id="performance-lazy-loading">Performance &amp; Lazy Loading<a class="headerlink" href="#performance-lazy-loading" title="Permanent link">&para;</a></h1>
+<p>dbcreds v2.0 introduces intelligent lazy loading to ensure fast imports and optimal performance, especially in environments like Jupyter and marimo notebooks.</p>
+<h2 id="fast-mode">🚀 Fast Mode<a class="headerlink" href="#fast-mode" title="Permanent link">&para;</a></h2>
+<h3 id="automatic-detection">Automatic Detection<a class="headerlink" href="#automatic-detection" title="Permanent link">&para;</a></h3>
+<p>dbcreds automatically detects when it's running in a marimo notebook and switches to fast mode:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># In marimo - no configuration needed!</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">conn_string</span> <span class="o">=</span> <span class="n">get_connection_string</span><span class="p">(</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>  <span class="c1"># Lightning fast!</span>
 </span></code></pre></div>
-<h2 id="backend-configuration">Backend Configuration<a class="headerlink" href="#backend-configuration" title="Permanent link">&para;</a></h2>
-<p>dbcreds automatically detects available backends. See <a href="../../security/backends/">Backends</a> for details.</p>
+<h3 id="manual-fast-mode">Manual Fast Mode<a class="headerlink" href="#manual-fast-mode" title="Permanent link">&para;</a></h3>
+<p>You can enable fast mode anywhere using an environment variable:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBCREDS_FAST_MODE</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>python<span class="w"> </span>your_script.py
+</span></code></pre></div>
+<p>Or programmatically:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBCREDS_FAST_MODE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">conn_string</span> <span class="o">=</span> <span class="n">get_connection_string</span><span class="p">(</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="direct-fast-access">Direct Fast Access<a class="headerlink" href="#direct-fast-access" title="Permanent link">&para;</a></h3>
+<p>Use the dedicated fast function to bypass all initialization:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string_fast</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">conn_string</span> <span class="o">=</span> <span class="n">get_connection_string_fast</span><span class="p">(</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="how-it-works">⚡ How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="lazy-module-loading">Lazy Module Loading<a class="headerlink" href="#lazy-module-loading" title="Permanent link">&para;</a></h3>
+<p>dbcreds uses Python's <code>__getattr__</code> to defer imports until actually needed:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># This doesn&#39;t load anything heavy</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dbcreds</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Only loads what&#39;s needed when you use it</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">conn_string</span> <span class="o">=</span> <span class="n">dbcreds</span><span class="o">.</span><span class="n">get_connection_string</span><span class="p">(</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="credential-resolution-order">Credential Resolution Order<a class="headerlink" href="#credential-resolution-order" title="Permanent link">&para;</a></h3>
+<p>In fast mode, dbcreds checks credentials in this order:</p>
+<ol>
+<li><strong>Environment Variables</strong> (fastest)</li>
+<li><code>DBCREDS_ENV_*</code> format</li>
+<li>
+<p>Legacy <code>DB_*</code> format (PowerShell compatibility)</p>
+</li>
+<li>
+<p><strong>Windows Credential Manager</strong> (Windows only)</p>
+</li>
+<li>
+<p>Direct API access without backend initialization</p>
+</li>
+<li>
+<p><strong>Error</strong> if not found</p>
+</li>
+</ol>
+<h3 id="performance-comparison">Performance Comparison<a class="headerlink" href="#performance-comparison" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Standard mode (full initialization)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Import time: ~0.8-1.2 seconds</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">CredentialManager</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">manager</span> <span class="o">=</span> <span class="n">CredentialManager</span><span class="p">()</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="c1"># Fast mode (lazy loading)</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># Import time: ~0.05-0.1 seconds</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">conn_string</span> <span class="o">=</span> <span class="n">get_connection_string</span><span class="p">(</span><span class="s2">&quot;prod&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="when-to-use-each-mode">🎯 When to Use Each Mode<a class="headerlink" href="#when-to-use-each-mode" title="Permanent link">&para;</a></h2>
+<h3 id="use-fast-mode-when">Use Fast Mode When:<a class="headerlink" href="#use-fast-mode-when" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Working in Jupyter/marimo notebooks</li>
+<li>Building CLI tools that need quick startup</li>
+<li>Only need connection strings (not full credential management)</li>
+<li>Running in CI/CD pipelines</li>
+<li>Building microservices with tight startup constraints</li>
+</ul>
+<h3 id="use-standard-mode-when">Use Standard Mode When:<a class="headerlink" href="#use-standard-mode-when" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Managing credentials (add/update/remove)</li>
+<li>Using the web interface</li>
+<li>Running credential rotation</li>
+<li>Testing connections</li>
+<li>Accessing full credential metadata</li>
+</ul>
+<h2 id="configuration">🔧 Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h3 id="environment-variables">Environment Variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h3>
+<p>Control dbcreds behavior with environment variables:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Enable fast mode globally</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBCREDS_FAST_MODE</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Enable debug logging (standard mode only)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBCREDS_DEBUG</span><span class="o">=</span><span class="nb">true</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="c1"># Custom config directory</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nb">export</span><span class="w"> </span><span class="nv">DBCREDS_CONFIG_DIR</span><span class="o">=</span>/custom/path
+</span></code></pre></div>
+<h3 id="programmatic-control">Programmatic Control<a class="headerlink" href="#programmatic-control" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Check if in fast mode</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dbcreds</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">if</span> <span class="n">dbcreds</span><span class="o">.</span><span class="n">USE_FAST_MODE</span><span class="p">:</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running in fast mode!&quot;</span><span class="p">)</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="c1"># Force standard mode even in marimo</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBCREDS_FAST_MODE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dbcreds</span>  <span class="c1"># Full initialization</span>
+</span></code></pre></div>
+<h2 id="benchmarks">📊 Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">&para;</a></h2>
+<p>Typical import times on modern hardware:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Import Time</th>
+<th>Memory Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard Mode</td>
+<td>0.8-1.2s</td>
+<td>~25MB</td>
+</tr>
+<tr>
+<td>Fast Mode</td>
+<td>0.05-0.1s</td>
+<td>~5MB</td>
+</tr>
+<tr>
+<td>Direct Fast</td>
+<td>0.02-0.05s</td>
+<td>~3MB</td>
+</tr>
+</tbody>
+</table>
+<h2 id="troubleshooting">🛠️ Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="import-still-slow">Import Still Slow?<a class="headerlink" href="#import-still-slow" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p>Ensure you're using the latest version:
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>dbcreds
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Check if fast mode is active:
+   <div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">dbcreds</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fast mode: </span><span class="si">{</span><span class="n">dbcreds</span><span class="o">.</span><span class="n">USE_FAST_MODE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Use direct fast access:
+   <div class="language-python highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds.fast</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string</span>
+</span></code></pre></div></p>
+</li>
+</ol>
+<h3 id="fast-mode-limitations">Fast Mode Limitations<a class="headerlink" href="#fast-mode-limitations" title="Permanent link">&para;</a></h3>
+<p>In fast mode, these features are not available:</p>
+<ul>
+<li><code>CredentialManager</code> class</li>
+<li>Credential add/update/remove operations  </li>
+<li>Web interface</li>
+<li>Connection testing</li>
+<li>Password rotation checks</li>
+</ul>
+<p>To use these features, disable fast mode:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;DBCREDS_FAST_MODE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">CredentialManager</span>
+</span></code></pre></div>
+<h2 id="debugging-performance">🔍 Debugging Performance<a class="headerlink" href="#debugging-performance" title="Permanent link">&para;</a></h2>
+<p>Enable timing logs to debug import performance:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">dbcreds</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_connection_string</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Import took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="c1"># More detailed timing</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="k">def</span><span class="w"> </span><span class="nf">time_import</span><span class="p">(</span><span class="n">module_name</span><span class="p">):</span>
+</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+</span><span id="__span-12-14"><a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</span><span id="__span-12-15"><a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>    <span class="k">return</span> <span class="n">module</span>
+</span><span id="__span-12-16"><a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>
+</span><span id="__span-12-17"><a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="c1"># Time individual components</span>
+</span><span id="__span-12-18"><a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="n">time_import</span><span class="p">(</span><span class="s1">&#39;dbcreds&#39;</span><span class="p">)</span>
+</span><span id="__span-12-19"><a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="n">time_import</span><span class="p">(</span><span class="s1">&#39;dbcreds.core&#39;</span><span class="p">)</span>
+</span><span id="__span-12-20"><a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="n">time_import</span><span class="p">(</span><span class="s1">&#39;dbcreds.utils.shortcuts&#39;</span><span class="p">)</span>
+</span></code></pre></div>
 
 
 
@@ -1370,7 +1724,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../installation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation">
+          <a href="../configuration/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Configuration">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1380,20 +1734,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Installation
+                Configuration
               </div>
             </div>
           </a>
         
         
           
-          <a href="../performance/" class="md-footer__link md-footer__link--next" aria-label="Next: Performance &amp; Lazy Loading">
+          <a href="../../guide/cli/" class="md-footer__link md-footer__link--next" aria-label="Next: CLI Reference">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Performance & Lazy Loading
+                CLI Reference
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -1,17 +1,25 @@
 === "pip"
+
     ```bash
-    pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds.git
+    pip install dbcreds
     ```
 
 === "uv"
+
     ```bash
-    uv pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds.git
+    uv add dbcreds
     ```
 
-=== "Development"
+=== "pipx (CLI only)"
+
+    ```bash
+    pipx install dbcreds
+    ```
+
+=== "From source"
+
     ```bash
     git clone https://github.com/Sunnova-ShakesDlamini/dbcreds.git
     cd dbcreds
-    uv venv
-    uv pip install -e ".[dev]"
+    pip install -e .
     ```

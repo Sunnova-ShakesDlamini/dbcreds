@@ -1,15 +1,17 @@
 ```python
-from dbcreds import get_engine, get_connection
+# Quick connection
+from dbcreds import get_connection_string
+conn = get_connection_string("prod")
 
-# Get SQLAlchemy engine
-engine = get_engine("dev")
+# With SQLAlchemy
+from dbcreds import get_engine
+engine = get_engine("prod")
 
-# Get connection
-with get_connection("prod") as conn:
-    df = pd.read_sql("SELECT * FROM users LIMIT 10", conn)
+# With pandas
+import pandas as pd
+df = pd.read_sql("SELECT * FROM users", get_connection_string("prod"))
 
 # Async support
 from dbcreds import get_async_engine
-
-async_engine = await get_async_engine("dev")
+async_engine = await get_async_engine("prod")
 ```

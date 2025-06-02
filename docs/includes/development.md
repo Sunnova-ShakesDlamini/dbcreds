@@ -1,14 +1,18 @@
+## Development Setup
+
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/Sunnova-ShakesDlamini/dbcreds.git
 cd dbcreds
 
-# Create virtual environment with uv
-uv venv
-uv pip install -e ".[dev]"
+# Install with dev dependencies
+pip install -e ".[dev]"
 
 # Run tests
 pytest
+
+# Run linting
+ruff check .
 
 # Build documentation
 mkdocs serve

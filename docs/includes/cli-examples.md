@@ -1,9 +1,9 @@
 ```bash
-# List all environments
-dbcreds list
+# Add a new environment
+dbcreds add dev --type postgresql --host localhost --port 5432
 
-# Show specific environment (without password)
-dbcreds show dev
+# List environments  
+dbcreds list
 
 # Test connection
 dbcreds test dev
@@ -11,12 +11,6 @@ dbcreds test dev
 # Update password
 dbcreds update dev --password
 
-# Remove environment
-dbcreds remove dev
-
-# Check password expiry
+# Check for expiring passwords
 dbcreds check
-
-# Export connection string
-dbcreds export dev --format uri
 ```

@@ -1,12 +1,14 @@
 ```bash
-# Install dbcreds
-pip install git+https://github.com/Sunnova-ShakesDlamini/dbcreds.git
+# Install
+pip install dbcreds
 
-# Initialize and add your first environment
-dbcreds init
-dbcreds add dev --type postgresql
+# Add environment
+dbcreds add prod --type postgresql
 
-# Use in your Python code
-from dbcreds import get_engine
-engine = get_engine("dev")
+# Set credentials (stored securely)
+dbcreds set prod --host db.company.com --port 5432 --database myapp --username dbuser
+
+# Use in Python
+from dbcreds import get_connection_string
+conn_string = get_connection_string("prod")
 ```

@@ -1,10 +1,9 @@
-## 🎯 Key Features
-
-- **Multi-Environment**: Manage dev, staging, and production credentials
-- **Secure Storage**: Uses your OS's native credential manager
-- **Password Rotation**: Built-in expiry tracking and notifications
-- **Rich CLI**: Beautiful terminal interface with auto-completion
-- **Type Safety**: Full type hints with Pydantic validation
-- **Multi-Database**: PostgreSQL, MySQL, Oracle, SQL Server support
-- **Team Ready**: Web UI for secure credential sharing
-- **Easy Integration**: Works with SQLAlchemy, pandas, and more
+- 🔐 **Secure Storage** - Credentials stored in system keychains, never in plain text
+- 🔄 **Password Rotation** - Built-in expiration tracking and rotation reminders  
+- 🌐 **Multi-Environment** - Easily manage dev, staging, and production credentials
+- 🚀 **Fast Access** - Optimized for quick imports in notebooks and scripts
+- 🗄️ **Multi-Backend** - PostgreSQL, MySQL, Oracle, SQL Server support
+- 🛡️ **Type-Safe** - Full type hints and validation with Pydantic
+- 🎯 **Simple API** - One line to get a connection string
+- 🖥️ **CLI & Web UI** - Manage credentials via terminal or browser
+- 🔌 **Extensible** - Plugin system for custom storage backends
