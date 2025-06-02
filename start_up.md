@@ -1,6 +1,6 @@
 # dbcreds Reference
 
-Auto-generated on 2025-06-02 16:18:36
+Auto-generated on 2025-06-02 18:12:04
 
 
 This file contains the latest source code for the dbcreds library.
@@ -17,6 +17,7 @@ Project organization showing the key files and their relationships:
 ```
 dbcreds/
 ├── __init__.py
+├── __init__.py.backup.20250602_164416
 ├── cli.py
 ├── export_fast.py
 ├── fast.py
@@ -33,17 +34,26 @@ dbcreds/
 │   ├── __init__.py
 │   ├── exceptions.py
 │   ├── manager.py
+│   ├── manager.py.backup.20250602_164416
 │   ├── models.py
 │   └── security.py
 ├── utils/
 │   ├── __init__.py
-│   └── shortcuts.py
+│   ├── shortcuts.py
+│   └── shortcuts.py.backup.20250602_164416
 └── web/
     ├── __init__.py
     ├── __main__.py
     ├── auth.py
     ├── errors.py
     ├── main.py
+    ├── static/
+    │   ├── favicon-16x16.png
+    │   ├── favicon-32x32.png
+    │   ├── favicon.ico
+    │   ├── logo.svg
+    │   └── css/
+    │       └── custom.css
     └── templates/
         ├── base.html
         ├── index.html
@@ -280,25 +290,109 @@ with support for multiple environments and database types.
 import os
 import sys
 
-from loguru import logger
-from rich.console import Console
-from rich.logging import RichHandler
-
-from dbcreds.core.manager import CredentialManager
-from dbcreds.core.models import DatabaseCredentials, DatabaseType, Environment
-from dbcreds.utils.shortcuts import (
-    get_async_engine,
-    get_connection,
-    get_connection_string,
-    get_connection_string_fast,  
-    get_credentials,
-    get_engine,
-)
-
 __version__ = "2.0.0"
+
+# Check for fast mode
+DBCREDS_FAST_MODE = os.environ.get('DBCREDS_FAST_MODE', '').lower() == 'true'
+IS_MARIMO = any('marimo' in mod for mod in sys.modules)
+
+# Use fast mode in marimo or when explicitly requested
+USE_FAST_MODE = DBCREDS_FAST_MODE or IS_MARIMO
+
+# Lazy loading state
+_manager = None
+_shortcuts_loaded = False
+_logger_initialized = False
+
+
+def _init_logger():
+    """Initialize logger only when needed."""
+    global _logger_initialized
+    if _logger_initialized:
+        return
+    
+    if not USE_FAST_MODE and os.getenv("DBCREDS_DEBUG"):
+        from loguru import logger
+        from rich.console import Console
+        from rich.logging import RichHandler
+        
+        logger.remove()
+        logger.add(
+            RichHandler(console=Console(stderr=True), rich_tracebacks=True),
+            format="{message}",
+            level="DEBUG",
+        )
+    else:
+        # Minimal logging in fast mode
+        import sys
+        from loguru import logger
+        logger.remove()
+        logger.add(sys.stderr, level="WARNING")
+    
+    _logger_initialized = True
+
+
+def _ensure_shortcuts():
+    """Lazy load shortcuts module."""
+    global _shortcuts_loaded
+    if not _shortcuts_loaded:
+        # Import shortcuts functions into module namespace
+        from dbcreds.utils.shortcuts import (
+            get_async_engine as _get_async_engine,
+            get_connection as _get_connection,
+            get_connection_string as _get_connection_string,
+            get_connection_string_fast as _get_connection_string_fast,
+            get_credentials as _get_credentials,
+            get_engine as _get_engine,
+        )
+        
+        # Make them available at module level
+        globals()['get_async_engine'] = _get_async_engine
+        globals()['get_connection'] = _get_connection
+        globals()['get_connection_string'] = _get_connection_string
+        globals()['get_connection_string_fast'] = _get_connection_string_fast
+        globals()['get_credentials'] = _get_credentials
+        globals()['get_engine'] = _get_engine
+        
+        _shortcuts_loaded = True
+
+
+def __getattr__(name):
+    """Lazy load attributes on demand."""
+    # Fast path for connection string in fast mode
+    if USE_FAST_MODE and name == 'get_connection_string':
+        from dbcreds.utils.shortcuts import get_connection_string_fast
+        return get_connection_string_fast
+    
+    # Load shortcuts on first access
+    if name in ['get_connection_string', 'get_credentials', 'get_engine', 
+                'get_async_engine', 'get_connection', 'get_connection_string_fast']:
+        _ensure_shortcuts()
+        return globals()[name]
+    
+    # Load manager on demand
+    if name == 'CredentialManager':
+        if USE_FAST_MODE:
+            # Return a lightweight error in fast mode
+            raise ImportError(
+                "CredentialManager not available in fast mode. "
+                "Use get_connection_string() directly or set DBCREDS_FAST_MODE=false"
+            )
+        _init_logger()
+        from dbcreds.core.manager import CredentialManager
+        return CredentialManager
+    
+    # Load models on demand
+    if name in ['DatabaseCredentials', 'DatabaseType', 'Environment']:
+        from dbcreds.core import models
+        return getattr(models, name)
+    
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 __all__ = [
     "CredentialManager",
-    "DatabaseCredentials",
+    "DatabaseCredentials", 
     "DatabaseType",
     "Environment",
     "get_connection",
@@ -306,22 +400,9 @@ __all__ = [
     "get_async_engine",
     "get_credentials",
     "get_connection_string",
-     "get_connection_string_fast",
+    "get_connection_string_fast",
 ]
 
-# Configure logger with rich handler
-logger.remove()  # Remove default handler
-
-if os.getenv("DBCREDS_DEBUG"):
-    # Debug mode with rich formatting
-    logger.add(
-        RichHandler(console=Console(stderr=True), rich_tracebacks=True),
-        format="{message}",
-        level="DEBUG",
-    )
-else:
-    # Production mode - minimal logging
-    logger.add(sys.stderr, level="WARNING")
 ```
 
 ```python # dbcreds\backends\__init__.py
@@ -388,7 +469,7 @@ class ValidationError(CredentialError):
 ```python # dbcreds\core\manager.py
 # dbcreds/core/manager.py
 """
-Core credential manager implementation.
+Core credential manager implementation with lazy initialization.
 
 This module provides the main CredentialManager class that orchestrates
 credential storage and retrieval across different backends.
@@ -398,29 +479,34 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Type
 
-from loguru import logger
-from pydantic import ValidationError
+# Lazy imports to speed up module loading
+_logger = None
+_ValidationError = None
+_models_loaded = False
+_backends_loaded = False
 
-from dbcreds.backends.base import CredentialBackend
-from dbcreds.backends.config import ConfigFileBackend
-from dbcreds.backends.environment import EnvironmentBackend
-from dbcreds.backends.keyring import KeyringBackend
-from dbcreds.core.exceptions import (
-    CredentialError,
-    CredentialNotFoundError,
-    PasswordExpiredError,
-)
-from dbcreds.core.models import DatabaseCredentials, DatabaseType, Environment
 
-# Conditional import for Windows
-if os.name == "nt":
-    from dbcreds.backends.legacy_windows import LegacyWindowsBackend
-    from dbcreds.backends.windows import WindowsCredentialBackend
+def _get_logger():
+    """Lazy load logger only when needed."""
+    global _logger
+    if _logger is None:
+        from loguru import logger
+        _logger = logger
+    return _logger
+
+
+def _load_models():
+    """Lazy load models."""
+    global _models_loaded, _ValidationError
+    if not _models_loaded:
+        from pydantic import ValidationError as _VE
+        _ValidationError = _VE
+        _models_loaded = True
 
 
 class CredentialManager:
     """
-    Main credential management class.
+    Main credential management class with lazy initialization.
 
     Orchestrates credential storage and retrieval across multiple backends,
     manages environments, and handles password expiration.
@@ -436,57 +522,110 @@ class CredentialManager:
         >>> manager.set_credentials("dev", "localhost", 5432, "mydb", "user", "pass")
         >>> creds = manager.get_credentials("dev")
     """
+    
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, config_dir: Optional[str] = None):
+        """Singleton pattern with lazy initialization."""
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self, config_dir: Optional[str] = None):
         """
-        Initialize the credential manager.
+        Initialize the credential manager with lazy loading.
 
         Args:
             config_dir: Optional custom configuration directory. Defaults to ~/.dbcreds
         """
+        # Only initialize once
+        if self._initialized:
+            return
+
         self.config_dir = config_dir or os.path.expanduser("~/.dbcreds")
-        os.makedirs(self.config_dir, exist_ok=True)
+        self.backends: List = []  # Avoid importing types
+        self.environments: Dict[str, object] = {}  # Avoid importing Environment
 
-        self.backends: List[CredentialBackend] = []
-        self.environments: Dict[str, Environment] = {}
+        # Don't do anything heavy yet!
+        self._initialized = True
+        self._backends_initialized = False
+        self._environments_loaded = False
 
-        self._initialize_backends()
-        self._load_environments()
+    def _ensure_initialized(self):
+        """Initialize backends and environments on first real use."""
+        if not self._backends_initialized:
+            os.makedirs(self.config_dir, exist_ok=True)
+            self._initialize_backends()
+            self._backends_initialized = True
 
-        logger.debug(
-            f"Initialized CredentialManager with {len(self.backends)} backends"
-        )
+        if not self._environments_loaded:
+            self._load_environments()
+            self._environments_loaded = True
 
     def _initialize_backends(self) -> None:
         """Initialize available credential backends in priority order."""
+        # Import these only when actually initializing
+        from dbcreds.backends.base import CredentialBackend
+        
         backend_classes: List[Type[CredentialBackend]] = []
 
         # Platform-specific backends first
         if os.name == "nt":
-            backend_classes.append(WindowsCredentialBackend)
-            # Add legacy backend for existing PowerShell credentials
-            backend_classes.append(LegacyWindowsBackend)
+            try:
+                from dbcreds.backends.windows import WindowsCredentialBackend
+                backend_classes.append(WindowsCredentialBackend)
+            except ImportError:
+                pass
+            
+            try:
+                from dbcreds.backends.legacy_windows import LegacyWindowsBackend
+                backend_classes.append(LegacyWindowsBackend)
+            except ImportError:
+                pass
 
         # Cross-platform backends
-        backend_classes.extend([KeyringBackend, EnvironmentBackend, ConfigFileBackend])
+        try:
+            from dbcreds.backends.keyring import KeyringBackend
+            backend_classes.append(KeyringBackend)
+        except ImportError:
+            pass
+            
+        try:
+            from dbcreds.backends.environment import EnvironmentBackend
+            backend_classes.append(EnvironmentBackend)
+        except ImportError:
+            pass
+            
+        try:
+            from dbcreds.backends.config import ConfigFileBackend
+            backend_classes.append(ConfigFileBackend)
+        except ImportError:
+            pass
 
         for backend_class in backend_classes:
             try:
                 backend = backend_class()
                 if backend.is_available():
                     self.backends.append(backend)
-                    logger.debug(f"Initialized backend: {backend.__class__.__name__}")
+                    _get_logger().debug(f"Initialized backend: {backend.__class__.__name__}")
             except Exception as e:
-                logger.debug(f"Failed to initialize {backend_class.__name__}: {e}")
+                _get_logger().debug(f"Failed to initialize {backend_class.__name__}: {e}")
 
         if not self.backends:
-            logger.warning(
+            _get_logger().warning(
                 "No credential backends available, falling back to config file only"
             )
+            from dbcreds.backends.config import ConfigFileBackend
             self.backends.append(ConfigFileBackend(self.config_dir))
 
     def _load_environments(self) -> None:
         """Load environment configurations from disk."""
+        from dbcreds.backends.config import ConfigFileBackend
+        from dbcreds.core.models import Environment
+        
+        _load_models()
+        
         config_backend = ConfigFileBackend(self.config_dir)
         environments_data = config_backend.load_environments()
 
@@ -494,16 +633,16 @@ class CredentialManager:
             try:
                 env = Environment(**env_data)
                 self.environments[env.name] = env
-            except ValidationError as e:
-                logger.error(f"Invalid environment data: {e}")
+            except _ValidationError as e:
+                _get_logger().error(f"Invalid environment data: {e}")
 
     def add_environment(
         self,
         name: str,
-        database_type: DatabaseType,
+        database_type,  # Avoid importing DatabaseType
         description: Optional[str] = None,
         is_production: bool = False,
-    ) -> Environment:
+    ):
         """
         Add a new environment configuration.
 
@@ -522,6 +661,11 @@ class CredentialManager:
         Examples:
             >>> manager.add_environment("dev", DatabaseType.POSTGRESQL, "Development database")
         """
+        self._ensure_initialized()
+        
+        from dbcreds.core.exceptions import CredentialError
+        from dbcreds.core.models import Environment
+        
         if name.lower() in self.environments:
             raise CredentialError(f"Environment '{name}' already exists")
 
@@ -535,7 +679,7 @@ class CredentialManager:
         self.environments[env.name] = env
         self._save_environments()
 
-        logger.info(f"Added environment: {env.name}")
+        _get_logger().info(f"Added environment: {env.name}")
         return env
 
     def remove_environment(self, name: str) -> None:
@@ -548,6 +692,10 @@ class CredentialManager:
         Raises:
             CredentialNotFoundError: If environment doesn't exist
         """
+        self._ensure_initialized()
+        
+        from dbcreds.core.exceptions import CredentialNotFoundError
+        
         env_name = name.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{name}' not found")
@@ -557,12 +705,12 @@ class CredentialManager:
             try:
                 backend.delete_credential(f"dbcreds:{env_name}")
             except Exception as e:
-                logger.debug(f"Failed to delete from {backend.__class__.__name__}: {e}")
+                _get_logger().debug(f"Failed to delete from {backend.__class__.__name__}: {e}")
 
         del self.environments[env_name]
         self._save_environments()
 
-        logger.info(f"Removed environment: {env_name}")
+        _get_logger().info(f"Removed environment: {env_name}")
 
     def set_credentials(
         self,
@@ -574,7 +722,7 @@ class CredentialManager:
         password: str,
         password_expires_days: Optional[int] = 90,
         **options,
-    ) -> DatabaseCredentials:
+    ):
         """
         Store credentials for an environment.
 
@@ -597,6 +745,11 @@ class CredentialManager:
         Examples:
             >>> manager.set_credentials("dev", "localhost", 5432, "mydb", "user", "pass")
         """
+        self._ensure_initialized()
+        
+        from dbcreds.core.exceptions import CredentialNotFoundError, CredentialError
+        from dbcreds.core.models import DatabaseCredentials
+        
         env_name = environment.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{environment}' not found")
@@ -630,19 +783,19 @@ class CredentialManager:
                     f"dbcreds:{env_name}", username, password, creds.model_dump()
                 ):
                     stored = True
-                    logger.debug(f"Stored credentials in {backend.__class__.__name__}")
+                    _get_logger().debug(f"Stored credentials in {backend.__class__.__name__}")
             except Exception as e:
-                logger.debug(f"Failed to store in {backend.__class__.__name__}: {e}")
+                _get_logger().debug(f"Failed to store in {backend.__class__.__name__}: {e}")
 
         if not stored:
             raise CredentialError("Failed to store credentials in any backend")
 
-        logger.info(f"Stored credentials for environment: {env_name}")
+        _get_logger().info(f"Stored credentials for environment: {env_name}")
         return creds
 
     def get_credentials(
         self, environment: str, check_expiry: bool = True
-    ) -> DatabaseCredentials:
+    ):
         """
         Retrieve credentials for an environment.
 
@@ -661,6 +814,11 @@ class CredentialManager:
             >>> creds = manager.get_credentials("dev")
             >>> print(creds.host, creds.port)
         """
+        self._ensure_initialized()
+        
+        from dbcreds.core.exceptions import CredentialNotFoundError, PasswordExpiredError
+        from dbcreds.core.models import DatabaseCredentials
+        
         env_name = environment.lower()
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{environment}' not found")
@@ -683,18 +841,18 @@ class CredentialManager:
                             f"Password for environment '{environment}' has expired"
                         )
 
-                    logger.debug(
+                    _get_logger().debug(
                         f"Retrieved credentials from {backend.__class__.__name__}"
                     )
                     return creds
             except Exception as e:
-                logger.debug(f"Failed to get from {backend.__class__.__name__}: {e}")
+                _get_logger().debug(f"Failed to get from {backend.__class__.__name__}: {e}")
 
         raise CredentialNotFoundError(
             f"No credentials found for environment '{environment}'"
         )
 
-    def list_environments(self) -> List[Environment]:
+    def list_environments(self):
         """
         List all configured environments.
 
@@ -706,6 +864,7 @@ class CredentialManager:
             >>> for env in envs:
             ...     print(env.name, env.database_type)
         """
+        self._ensure_initialized()
         return list(self.environments.values())
 
     def test_connection(self, environment: str) -> bool:
@@ -722,6 +881,10 @@ class CredentialManager:
             >>> if manager.test_connection("dev"):
             ...     print("Connection successful!")
         """
+        self._ensure_initialized()
+        
+        from dbcreds.core.models import DatabaseType
+        
         try:
             creds = self.get_credentials(environment)
             env = self.environments[environment.lower()]
@@ -742,11 +905,13 @@ class CredentialManager:
             # Add other database types as needed
 
         except Exception as e:
-            logger.error(f"Connection test failed for '{environment}': {e}")
+            _get_logger().error(f"Connection test failed for '{environment}': {e}")
             return False
 
     def _save_environments(self) -> None:
         """Save environment configurations to disk."""
+        from dbcreds.backends.config import ConfigFileBackend
+        
         config_backend = ConfigFileBackend(self.config_dir)
         config_backend.save_environments(
             [env.model_dump() for env in self.environments.values()]
@@ -3119,7 +3284,6 @@ if __name__ == "__main__":
 
 ```python # dbcreds\utils\shortcuts.py
 # dbcreds/utils/shortcuts.py
-# dbcreds/utils/shortcuts.py
 """
 Convenience functions for common dbcreds operations.
 
@@ -3133,27 +3297,33 @@ import os
 import ctypes
 import ctypes.wintypes
 import json
+from functools import lru_cache
 
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-
-from dbcreds.core.exceptions import CredentialError
-from dbcreds.core.manager import CredentialManager
-from dbcreds.core.models import DatabaseCredentials, DatabaseType
-
-# Global credential manager instance
-_manager: Optional[CredentialManager] = None
+# Lazy imports
+_sqlalchemy = None
+_manager = None
+_CredentialError = None
 
 
-def _get_manager() -> CredentialManager:
+def _get_credential_error():
+    """Lazy load CredentialError."""
+    global _CredentialError
+    if _CredentialError is None:
+        from dbcreds.core.exceptions import CredentialError
+        _CredentialError = CredentialError
+    return _CredentialError
+
+
+def _get_manager():
     """Get or create the global credential manager."""
     global _manager
     if _manager is None:
+        from dbcreds.core.manager import CredentialManager
         _manager = CredentialManager()
     return _manager
 
 
+@lru_cache(maxsize=10)
 def get_connection_string_fast(environment: str = "default") -> str:
     """
     Get database connection string using fast, marimo-friendly method.
@@ -3170,7 +3340,7 @@ def get_connection_string_fast(environment: str = "default") -> str:
         Database connection URI
         
     Raises:
-        CredentialError: If credentials not found
+        ValueError: If credentials not found
         
     Examples:
         >>> # In a marimo notebook
@@ -3188,7 +3358,7 @@ def get_connection_string_fast(environment: str = "default") -> str:
         if conn_string:
             return conn_string
     
-    raise CredentialError(
+    raise ValueError(
         f"No credentials found for environment '{environment}'. "
         "Please ensure credentials are set in environment variables or Windows Credential Manager."
     )
@@ -3320,9 +3490,7 @@ def _read_windows_credential(target: str) -> Dict[str, Any]:
     return {}
 
 
-
-
-def get_credentials(environment: str = "default") -> DatabaseCredentials:
+def get_credentials(environment: str = "default"):
     """
     Get database credentials for an environment.
 
@@ -3356,6 +3524,10 @@ def get_connection_string(environment: str = "default", include_password: bool =
         >>> print(uri)
         'postgresql://user:pass@localhost:5432/mydb'
     """
+    # Try fast method first if we're in fast mode
+    if os.environ.get('DBCREDS_FAST_MODE', '').lower() == 'true':
+        return get_connection_string_fast(environment)
+    
     creds = get_credentials(environment)
     return creds.get_connection_string(include_password=include_password)
 
@@ -3382,8 +3554,11 @@ def get_connection(environment: str = "default", **kwargs):
     env = manager.environments.get(environment.lower())
 
     if not env:
-        raise CredentialError(f"Environment '{environment}' not found")
+        raise _get_credential_error()(f"Environment '{environment}' not found")
 
+    # Import DatabaseType only when needed
+    from dbcreds.core.models import DatabaseType
+    
     # Get appropriate connection based on database type
     if env.database_type == DatabaseType.POSTGRESQL:
         import psycopg2
@@ -3423,7 +3598,7 @@ def get_connection(environment: str = "default", **kwargs):
         raise NotImplementedError(f"Database type {env.database_type} not yet implemented")
 
 
-def get_engine(environment: str = "default", **kwargs) -> Engine:
+def get_engine(environment: str = "default", **kwargs):
     """
     Get a SQLAlchemy engine for an environment.
 
@@ -3439,11 +3614,16 @@ def get_engine(environment: str = "default", **kwargs) -> Engine:
         >>> with engine.connect() as conn:
         ...     result = conn.execute("SELECT 1")
     """
+    global _sqlalchemy
+    if _sqlalchemy is None:
+        from sqlalchemy import create_engine
+        _sqlalchemy = create_engine
+    
     conn_string = get_connection_string(environment)
-    return create_engine(conn_string, **kwargs)
+    return _sqlalchemy(conn_string, **kwargs)
 
 
-async def get_async_engine(environment: str = "default", **kwargs) -> AsyncEngine:
+async def get_async_engine(environment: str = "default", **kwargs):
     """
     Get an async SQLAlchemy engine for an environment.
 
@@ -3459,13 +3639,18 @@ async def get_async_engine(environment: str = "default", **kwargs) -> AsyncEngin
         >>> async with engine.connect() as conn:
         ...     result = await conn.execute("SELECT 1")
     """
+    from sqlalchemy.ext.asyncio import create_async_engine
+    
     manager = _get_manager()
     creds = manager.get_credentials(environment)
     env = manager.environments.get(environment.lower())
 
     if not env:
-        raise CredentialError(f"Environment '{environment}' not found")
+        raise _get_credential_error()(f"Environment '{environment}' not found")
 
+    # Import DatabaseType only when needed
+    from dbcreds.core.models import DatabaseType
+    
     # Build async connection string
     if env.database_type == DatabaseType.POSTGRESQL:
         driver = "postgresql+asyncpg"
@@ -3476,7 +3661,6 @@ async def get_async_engine(environment: str = "default", **kwargs) -> AsyncEngin
 
     conn_string = f"{driver}://{creds.username}:{creds.password.get_secret_value()}@{creds.host}:{creds.port}/{creds.database}"
     return create_async_engine(conn_string, **kwargs)
-
 
 ```
 
@@ -4141,11 +4325,16 @@ if __name__ == "__main__":
 ```html # dbcreds\web\templates\base.html
 <!-- dbcreds/web/templates/base.html -->
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ title }}{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -4157,281 +4346,240 @@ if __name__ == "__main__":
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Custom styles -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+    
+    <!-- Theme detection script -->
+    <script>
+        // Check for saved theme or default to system preference
+        const savedTheme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+    
+    <!-- Tailwind config -->
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        'dbcreds-blue': '#1E90FF',
+                        'dbcreds-green': '#5AC85A',
+                        'dbcreds-light-green': '#90EE90',
+                        'dbcreds-dark-blue': '#2F3640',
+                        'dbcreds-gray': '#C0C0C0',
+                        'dbcreds-dark-gray': '#4B4B4B',
+                        'dbcreds-teal': '#00b8a9',
+                        'dbcreds-purple': '#6C5CE7',
+                        'dbcreds-orange': '#FFA502',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
         [x-cloak] { display: none !important; }
-        
-        /* Animation for notifications */
-        @keyframes fade-in-down {
-            0% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes fade-out-up {
-            0% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-        }
-        
-        .animate-fade-in-down {
-            animation: fade-in-down 0.3s ease-out;
-        }
-        
-        .animate-fade-out-up {
-            animation: fade-out-up 0.3s ease-out;
-        }
-    /* Add these styles to the <style> section in base.html */
-
-[x-cloak] { display: none !important; }
-
-/* HTMX loading indicator */
-.htmx-indicator {
-    display: none;
-}
-.htmx-request .htmx-indicator {
-    display: flex !important;
-}
-.htmx-request.htmx-indicator {
-    display: flex !important;
-}
-
-/* Animation for notifications */
-@keyframes fade-in-down {
-    0% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fade-out-up {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-}
-
-.animate-fade-in-down {
-    animation: fade-in-down 0.3s ease-out;
-}
-
-.animate-fade-out-up {
-    animation: fade-out-up 0.3s ease-out;
-}
-
-/* Loading spinner animation */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-/* Modal backdrop animation */
-.modal-backdrop-enter {
-    opacity: 0;
-}
-.modal-backdrop-enter-active {
-    opacity: 1;
-    transition: opacity 300ms ease-out;
-}
-
-/* Success/Error animations */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px); }
-}
-
-.animate-shake {
-    animation: shake 0.5s ease-in-out;
-}
-
-/* Disable form elements during submission */
-form.htmx-request input,
-form.htmx-request select,
-form.htmx-request textarea,
-form.htmx-request button {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
     </style>
 </head>
-<body class="h-full bg-gray-50">
-    <div class="min-h-full">
+<body class="h-full transition-colors duration-300">
+    <div class="min-h-full flex flex-col">
         <!-- Navigation -->
-        <nav class="bg-white shadow-sm">
+        <nav class="shadow-lg">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex h-16 justify-between">
                     <div class="flex">
                         <div class="flex flex-shrink-0 items-center">
-                            <h1 class="text-xl font-bold text-gray-900">dbcreds</h1>
+                            <img src="/static/logo.svg" alt="dbcreds" class="h-8 w-8 mr-2 rounded-lg shadow-md">
+                            <h1 class="text-xl font-bold text-white">dbcreds</h1>
+                            <span class="ml-3 fast-mode-indicator">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                Fast Mode
+                            </span>
                         </div>
                         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                            <a href="/" class="border-indigo-500 text-gray-900 inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium">
+                            <a href="/" class="text-white hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
                                 Environments
                             </a>
-                            <a href="/settings" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium">
+                            <a href="/settings" class="text-white hover:text-gray-200 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
                                 Settings
                             </a>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <span class="text-sm text-gray-500">v{{ version }}</span>
+                    <div class="flex items-center space-x-4">
+                        <!-- Theme Toggle -->
+                        <button onclick="toggleTheme()" class="theme-toggle" title="Toggle theme">
+                            <svg class="w-5 h-5 hidden dark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <svg class="w-5 h-5 light-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                            <span class="ml-2 hidden sm:inline">Theme</span>
+                        </button>
+                        <span class="text-sm text-gray-200">v{{ version }}</span>
                     </div>
                 </div>
             </div>
         </nav>
 
         <!-- Main content -->
-        <main>
+        <main class="flex-grow">
             <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
                 {% block content %}{% endblock %}
             </div>
         </main>
+        
+        <!-- Footer -->
+        <footer class="mt-auto py-4">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+                <p class="text-sm">
+                    Made with 💚 by <a href="https://github.com/Sunnova-ShakesDlamini" class="font-semibold hover:underline">Sunnova ShakesDlamini</a>
+                </p>
+                <div class="mt-2 space-x-4 text-xs">
+                    <a href="https://github.com/Sunnova-ShakesDlamini/dbcreds" class="hover:underline">GitHub</a>
+                    <a href="https://pypi.org/project/dbcreds/" class="hover:underline">PyPI</a>
+                    <a href="https://sunnova-shakesdlamini.github.io/dbcreds/" class="hover:underline">Docs</a>
+                </div>
+            </div>
+        </footer>
     </div>
     
-    <!-- Notification container - notifications will be inserted here -->
+    <!-- Notification container -->
     <div id="notification-container"></div>
-<script>
-// Add this to base.html in a <script> tag
-
-function showNotification(message, type = 'success', duration = 3000) {
-    const container = document.getElementById('notification-container');
     
-    // Define styles for different notification types
-    const styles = {
-        success: {
-            bg: 'bg-green-50',
-            border: 'border-green-200',
-            text: 'text-green-800',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>',
-            iconColor: 'text-green-600'
-        },
-        error: {
-            bg: 'bg-red-50',
-            border: 'border-red-200',
-            text: 'text-red-800',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>',
-            iconColor: 'text-red-600'
-        },
-        warning: {
-            bg: 'bg-yellow-50',
-            border: 'border-yellow-200',
-            text: 'text-yellow-800',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>',
-            iconColor: 'text-yellow-600'
-        },
-        info: {
-            bg: 'bg-blue-50',
-            border: 'border-blue-200',
-            text: 'text-blue-800',
-            icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-            iconColor: 'text-blue-600'
+    <script>
+        // Theme management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcons();
         }
-    };
-    
-    const style = styles[type] || styles.success;
-    
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 z-50 animate-fade-in-down';
-    notification.innerHTML = `
-        <div class="${style.bg} ${style.border} ${style.text} px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md">
-            <svg class="h-5 w-5 ${style.iconColor} flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                ${style.icon}
-            </svg>
-            <span class="font-medium">${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto -mr-1 p-1 hover:opacity-75">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-    `;
-    
-    // Add to container
-    container.insertBefore(notification, container.firstChild);
-    
-    // Auto-remove after duration
-    if (duration > 0) {
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.classList.add('animate-fade-out-up');
-                setTimeout(() => notification.remove(), 300);
+        
+        function updateThemeIcons() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const darkIcon = document.querySelector('.dark-icon');
+            const lightIcon = document.querySelector('.light-icon');
+            
+            if (theme === 'dark') {
+                darkIcon.style.display = 'block';
+                lightIcon.style.display = 'none';
+            } else {
+                darkIcon.style.display = 'none';
+                lightIcon.style.display = 'block';
             }
-        }, duration);
-    }
-}
-
-// HTMX event listeners for better integration
-document.body.addEventListener('htmx:afterRequest', function(event) {
-    // You can add custom handling here for successful requests
-    if (event.detail.successful && event.detail.xhr.status === 200) {
-        // Check if there's a custom success message in response headers
-        const successMessage = event.detail.xhr.getResponseHeader('X-Success-Message');
-        if (successMessage) {
-            showNotification(successMessage, 'success');
         }
-    }
-});
-
-document.body.addEventListener('htmx:responseError', function(event) {
-    // Handle errors globally
-    const errorMessage = event.detail.xhr.getResponseHeader('X-Error-Message') || 'An error occurred';
-    showNotification(errorMessage, 'error', 5000);
-});
+        
+        // Initialize theme icons
+        updateThemeIcons();
+        
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                updateThemeIcons();
+            }
+        });
+        
+        // Notification system
+        function showNotification(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('notification-container');
+            
+            const styles = {
+                success: {
+                    gradient: 'from-dbcreds-green to-green-600',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>'
+                },
+                error: {
+                    gradient: 'from-red-500 to-red-600',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>'
+                },
+                warning: {
+                    gradient: 'from-dbcreds-orange to-orange-600',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>'
+                },
+                info: {
+                    gradient: 'from-dbcreds-blue to-blue-600',
+                    icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'
+                }
+            };
+            
+            const style = styles[type] || styles.success;
+            
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 animate-fade-in-down';
+            notification.innerHTML = `
+                <div class="bg-gradient-to-r ${style.gradient} text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 max-w-md">
+                    <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        ${style.icon}
+                    </svg>
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-auto -mr-1 p-1 hover:opacity-75">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            container.insertBefore(notification, container.firstChild);
+            
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.classList.add('animate-fade-out-up');
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, duration);
+            }
+        }
     </script>
 </body>
 </html>
+
 ```
 
 ```html # dbcreds\web\templates\index.html
-<!-- # dbcreds/web/templates/index.html -->
+<!-- dbcreds/web/templates/index.html -->
 {% extends "base.html" %}
 
 {% block content %}
 <div class="px-4 sm:px-0">
-    <div class="sm:flex sm:items-center">
+    <!-- Hero Section -->
+    <div class="hero-section mb-8">
+        <h1 class="text-3xl font-bold mb-2">Database Environments</h1>
+        <p class="text-lg opacity-90">
+            Manage your database credentials securely across different environments
+        </p>
+    </div>
+    
+    <div class="sm:flex sm:items-center mb-6">
         <div class="sm:flex-auto">
-            <h1 class="text-2xl font-semibold leading-6 text-gray-900">Database Environments</h1>
-            <p class="mt-2 text-sm text-gray-700">
-                Manage your database credentials securely across different environments.
+            <p class="text-sm text-gray-700">
+                All credentials are encrypted and stored securely in your system's credential manager.
             </p>
         </div>
         <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <button type="button" 
-                    class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    class="btn-primary block rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     hx-get="/environments/new"
                     hx-target="#modal">
-                Add environment
+                Add Environment
             </button>
         </div>
     </div>
     
     <!-- Environment list -->
-    <div class="mt-8" id="environment-list" hx-get="/environments" hx-trigger="load">
+    <div class="card" id="environment-list" hx-get="/environments" hx-trigger="load">
         <!-- Loading state -->
-        <div class="flex justify-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div class="flex justify-center p-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-dbcreds-blue"></div>
         </div>
     </div>
 </div>
@@ -4440,83 +4588,28 @@ document.body.addEventListener('htmx:responseError', function(event) {
 <div id="modal"></div>
 {% endblock %}
 
-
-# dbcreds/web/templates/partials/environment_list.html
-<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-    <table class="min-w-full divide-y divide-gray-300">
-        <thead class="bg-gray-50">
-            <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                    Environment
-                </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Type
-                </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Description
-                </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Status
-                </th>
-                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                    <span class="sr-only">Actions</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-            {% for env in environments %}
-            <tr>
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                    {{ env.name }}
-                    {% if env.is_production %}
-                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                        Production
-                    </span>
-                    {% endif %}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ env.database_type.value }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ env.description or "-" }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                        Active
-                    </span>
-                </td>
-                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                    <span class="text-gray-300 mx-2">|</span>
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Test</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 ```
 
 ```html # dbcreds\web\templates\partials\environment_list.html
 <!-- dbcreds/web/templates/partials/environment_list.html -->
 {% if environments %}
-<div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-    <table class="min-w-full divide-y divide-gray-300">
-        <thead class="bg-gray-50">
+<div class="overflow-hidden shadow-lg rounded-lg">
+    <table class="min-w-full">
+        <thead>
             <tr>
-                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">
                     Environment
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Type
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Description
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Password Expiry
                 </th>
-                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-white">
                     Status
                 </th>
                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
@@ -4524,41 +4617,55 @@ document.body.addEventListener('htmx:responseError', function(event) {
                 </th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
+        <tbody class="divide-y divide-gray-200">
             {% for env in environments %}
-            <tr>
-                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium sm:pl-6">
                     {{ env.name }}
                     {% if env.is_production %}
-                    <span class="ml-2 inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                    <span class="ml-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium badge-danger">
                         Production
                     </span>
                     {% endif %}
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ env.database_type.value }}
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                    <span class="badge badge-info">{{ env.database_type.value }}</span>
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
                     {{ env.description or "-" }}
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500" id="expiry-{{ env.name }}">
-                    <span class="text-gray-400">Loading...</span>
+                <td class="whitespace-nowrap px-3 py-4 text-sm" id="expiry-{{ env.name }}">
+                    <span class="inline-flex items-center">
+                        <svg class="animate-spin h-4 w-4 mr-2 spinner" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Loading...
+                    </span>
                 </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                <td class="whitespace-nowrap px-3 py-4 text-sm">
+                    <span class="badge badge-success">
                         Active
                     </span>
                 </td>
                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <a href="#" 
-                       hx-get="/environments/{{ env.name }}/edit" 
-                       hx-target="#modal"
-                       class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                    <span class="text-gray-300 mx-2">|</span>
-                    <a href="#" 
-                       hx-post="/environments/{{ env.name }}/test" 
-                       hx-target="#test-result-{{ env.name }}"
-                       class="text-indigo-600 hover:text-indigo-900">Test</a>
+                    <button hx-get="/environments/{{ env.name }}/edit" 
+                            hx-target="#modal"
+                            class="text-dbcreds-blue hover:text-blue-700 font-medium mr-3">
+                        Edit
+                    </button>
+                    <button hx-post="/environments/{{ env.name }}/test" 
+                            hx-target="#test-result-{{ env.name }}"
+                            hx-indicator="#test-indicator-{{ env.name }}"
+                            class="text-dbcreds-green hover:text-green-700 font-medium">
+                        Test
+                    </button>
+                    <span id="test-indicator-{{ env.name }}" class="htmx-indicator ml-2">
+                        <svg class="animate-spin h-4 w-4 inline spinner" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </span>
                     <div id="test-result-{{ env.name }}" class="mt-1"></div>
                 </td>
             </tr>
@@ -4567,10 +4674,8 @@ document.body.addEventListener('htmx:responseError', function(event) {
     </table>
 </div>
 
-<!-- Script to load expiry information -->
 <script>
-// Updated loadExpiryInfo function for environment_list.html
-
+// Load expiry information with better error handling
 function loadExpiryInfo(envName) {
     fetch("/api/environments/" + envName + "/expiry")
         .then(response => response.json())
@@ -4578,71 +4683,40 @@ function loadExpiryInfo(envName) {
             const element = document.getElementById("expiry-" + envName);
             if (!element) return;
             
-            if (data.error) {
-                console.error("Error fetching expiry data:", data.error);
-                element.innerHTML = "<span class=\"text-gray-400\">Unable to load</span>";
-                return;
-            }
+            let html = '';
+            let badgeClass = '';
             
-            // Check if we have update date but no expiry date stored
-            if (data.updated_at && !data.expires_at && data.expires_days) {
-                // Calculate theoretical expiry
-                const updateDate = new Date(data.updated_at);
-                const theoreticalExpiry = new Date(updateDate);
-                theoreticalExpiry.setDate(theoreticalExpiry.getDate() + data.expires_days);
-                
-                const now = new Date();
-                const daysLeft = Math.floor((theoreticalExpiry - now) / (1000 * 60 * 60 * 24));
-                
-                if (daysLeft <= 0) {
-                    element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired (not tracked)</span>";
-                } else if (daysLeft <= 7) {
-                    element.innerHTML = "<span class=\"text-red-600\">" + daysLeft + " days left (not tracked)</span>";
-                } else if (daysLeft <= 30) {
-                    element.innerHTML = "<span class=\"text-yellow-600\">" + daysLeft + " days left (not tracked)</span>";
-                } else {
-                    element.innerHTML = "<span class=\"text-blue-600\">" + daysLeft + " days left (not tracked)</span>";
-                }
-                
-                element.title = "Password updated on: " + updateDate.toLocaleDateString() + 
-                              "\nWould expire on: " + theoreticalExpiry.toLocaleDateString() + 
-                              "\n(Expiry not being tracked - click Edit to enable)";
+            if (data.error) {
+                html = '<span class="badge bg-gray-500 text-white">Error</span>';
             } else if (data.is_expired) {
-                element.innerHTML = "<span class=\"text-red-600 font-medium\">Expired</span>";
+                html = '<span class="badge badge-danger">Expired</span>';
             } else if (data.days_left !== null) {
                 if (data.days_left <= 7) {
-                    element.innerHTML = "<span class=\"text-red-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-danger';
                 } else if (data.days_left <= 30) {
-                    element.innerHTML = "<span class=\"text-yellow-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-warning';
                 } else {
-                    element.innerHTML = "<span class=\"text-green-600\">" + data.days_left + " days left</span>";
+                    badgeClass = 'badge-success';
                 }
-                
-                // Add expires date as tooltip/title
-                if (data.expires_at) {
-                    const expiresDate = new Date(data.expires_at);
-                    const formattedDate = expiresDate.toLocaleDateString();
-                    element.title = "Expires on: " + formattedDate;
-                }
-            } else if (data.updated_at) {
-                // If no expiry but we have update date, show as not tracked
-                const updatedDate = new Date(data.updated_at);
-                element.innerHTML = "<span class=\"text-gray-500\">Not tracked</span>";
-                element.title = "Password updated on: " + updatedDate.toLocaleDateString() + 
-                              "\nExpiry tracking not enabled";
+                html = `<span class="badge ${badgeClass}">${data.days_left} days left</span>`;
+            } else if (data.updated_at && !data.has_expiry) {
+                html = '<span class="badge bg-gray-500 text-white">Not tracked</span>';
             } else {
-                element.innerHTML = "<span class=\"text-gray-400\">No expiry set</span>";
+                html = '<span class="badge bg-gray-500 text-white">No expiry</span>';
             }
+            
+            element.innerHTML = html;
         })
         .catch(error => {
             console.error("Error loading expiry:", error);
             const element = document.getElementById("expiry-" + envName);
             if (element) {
-                element.innerHTML = "<span class=\"text-gray-400\">Error loading</span>";
+                element.innerHTML = '<span class="badge bg-gray-500 text-white">Error</span>';
             }
         });
 }
 
+// Load all expiry info
 function loadAllExpiryInfo() {
     {% for env in environments %}
     loadExpiryInfo("{{ env.name }}");
@@ -4651,21 +4725,21 @@ function loadAllExpiryInfo() {
 
 // Initial load
 document.addEventListener("DOMContentLoaded", loadAllExpiryInfo);
-
-// For HTMX updates
-document.body.addEventListener("htmx:afterSwap", function(event) {
-    if (event.detail.target.id === "environment-list") {
-        setTimeout(loadAllExpiryInfo, 100);  // Small delay to ensure DOM is updated
-    }
-});
-
-// Call immediately in case DOM is already loaded
 loadAllExpiryInfo();
 </script>
 {% else %}
 <!-- Empty state -->
-<div class="py-6 text-center">
-    <p class="text-gray-500">No environments configured yet. Add one to get started.</p>
+<div class="card text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+    </svg>
+    <p class="text-gray-500 mb-4">No environments configured yet.</p>
+    <button type="button" 
+            class="btn-primary mx-auto"
+            hx-get="/environments/new"
+            hx-target="#modal">
+        Add Your First Environment
+    </button>
 </div>
 {% endif %}
 
@@ -4688,7 +4762,7 @@ loadAllExpiryInfo();
     <div class="mt-6 space-y-8">
         
         <!-- General Settings -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">General Settings</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -4706,7 +4780,7 @@ loadAllExpiryInfo();
                             <label class="text-sm font-medium text-gray-900">Default Password Expiry</label>
                             <p class="text-sm text-gray-500">90 days</p>
                         </div>
-                        <button type="button" class="text-sm text-indigo-600 hover:text-indigo-500">
+                        <button type="button" class="text-sm text-dbcreds-blue hover:text-blue-700">
                             Change
                         </button>
                     </div>
@@ -4715,7 +4789,7 @@ loadAllExpiryInfo();
         </div>
 
         <!-- Backend Information -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Storage Backends</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -4729,7 +4803,7 @@ loadAllExpiryInfo();
                                 <p class="text-sm font-medium text-gray-900">{{ backend.name }}</p>
                                 <p class="text-sm text-gray-500">{{ backend.description }}</p>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if backend.available %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if backend.available %}badge-success{% else %}bg-gray-100 text-gray-800{% endif %}">
                                 {% if backend.available %}Available{% else %}Not Available{% endif %}
                             </span>
                         </li>
@@ -4740,7 +4814,7 @@ loadAllExpiryInfo();
         </div>
 
         <!-- Security Settings -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Security</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
@@ -4749,7 +4823,8 @@ loadAllExpiryInfo();
                 <div class="mt-5 space-y-4">
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input id="warn-expiry" name="warn-expiry" type="checkbox" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            <input id="warn-expiry" name="warn-expiry" type="checkbox" checked 
+                                   class="focus:ring-dbcreds-blue h-4 w-4 text-dbcreds-blue border-gray-300 rounded">
                         </div>
                         <div class="ml-3 text-sm">
                             <label for="warn-expiry" class="font-medium text-gray-700">Password expiry warnings</label>
@@ -4758,7 +4833,8 @@ loadAllExpiryInfo();
                     </div>
                     <div class="flex items-start">
                         <div class="flex items-center h-5">
-                            <input id="auto-lock" name="auto-lock" type="checkbox" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                            <input id="auto-lock" name="auto-lock" type="checkbox" 
+                                   class="focus:ring-dbcreds-blue h-4 w-4 text-dbcreds-blue border-gray-300 rounded">
                         </div>
                         <div class="ml-3 text-sm">
                             <label for="auto-lock" class="font-medium text-gray-700">Auto-lock credentials</label>
@@ -4770,21 +4846,21 @@ loadAllExpiryInfo();
         </div>
 
         <!-- Export/Import -->
-        <div class="bg-white shadow sm:rounded-lg">
+        <div class="card">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Export & Import</h3>
                 <div class="mt-2 max-w-xl text-sm text-gray-500">
                     <p>Export environment configurations or import from backup.</p>
                 </div>
                 <div class="mt-5 flex space-x-3">
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button type="button" class="btn-secondary inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                         </svg>
                         Export Configuration
                     </button>
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button type="button" class="btn-secondary inline-flex items-center px-4 py-2 shadow-sm text-sm font-medium rounded-md">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         Import Configuration
@@ -4794,7 +4870,7 @@ loadAllExpiryInfo();
         </div>
 
         <!-- Danger Zone -->
-        <div class="bg-red-50 shadow sm:rounded-lg">
+        <div class="card bg-red-50 border-red-200">
             <div class="px-4 py-5 sm:p-6">
                 <h3 class="text-lg font-medium leading-6 text-red-900">Danger Zone</h3>
                 <div class="mt-2 max-w-xl text-sm text-red-700">
@@ -4811,6 +4887,7 @@ loadAllExpiryInfo();
     </div>
 </div>
 {% endblock %}
+
 ```
 
 
