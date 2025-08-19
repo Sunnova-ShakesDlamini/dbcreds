@@ -29,6 +29,11 @@ from dbcreds.core.exceptions import CredentialError
 from dbcreds.core.manager import CredentialManager
 from dbcreds.core.models import DatabaseType
 from dbcreds.web.errors import web_error_handler
+from dbcreds.web.security_config import (
+    get_security_headers,
+    print_security_warnings,
+    sanitize_log_data,
+)
 
 # Install rich traceback handler
 install_rich_traceback(show_locals=True)
@@ -79,12 +84,9 @@ app.add_middleware(
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = (
-        "max-age=31536000; includeSubDomains"
-    )
+    # Add comprehensive security headers
+    for header, value in get_security_headers().items():
+        response.headers[header] = value
     return response
 
 
@@ -176,7 +178,7 @@ async def create_environment(request: Request):
                 # If parsing fails, use current date
                 password_updated_at = None
 
-        # Set credentials
+        # Set credentials with the custom password_updated_at if provided
         expires_days = int(form_data.get("expires_days", 90))
         manager.set_credentials(
             env_name,
@@ -186,37 +188,8 @@ async def create_environment(request: Request):
             username=form_data.get("username"),
             password=form_data.get("password"),
             password_expires_days=expires_days,
+            password_updated_at=password_updated_at,  # Pass the custom timestamp if provided
         )
-
-        # If a custom password update date was provided, update it
-        if password_updated_at:
-            # Update the password_updated_at field in the backend
-            for backend in manager.backends:
-                if backend.is_available():
-                    try:
-                        # Get the credential we just stored
-                        result = backend.get_credential(f"dbcreds:{env_name}")
-                        if result:
-                            username, password, metadata = result
-                            # Update the password_updated_at field
-                            metadata["password_updated_at"] = (
-                                password_updated_at.isoformat()
-                            )
-                            # Recalculate expiry based on the custom date
-                            if expires_days > 0:
-                                expires_at = password_updated_at + timedelta(
-                                    days=expires_days
-                                )
-                                metadata["password_expires_at"] = expires_at.isoformat()
-                            # Save back to the backend
-                            backend.set_credential(
-                                f"dbcreds:{env_name}", username, password, metadata
-                            )
-                            break
-                    except Exception as backend_error:
-                        logger.error(
-                            f"Error updating password date in backend: {backend_error}"
-                        )
 
         # Get updated environments list
         environments = manager.list_environments()
@@ -451,10 +424,15 @@ async def edit_environment_form(request: Request, env_name: str):
                             Edit Environment: {env_name}
                         </h3>
                         <div class="mt-2">
-                            <form hx-put="/environments/{env_name}" 
+                            <form method="POST" 
+                                action="/environments/{env_name}"
+                                hx-put="/environments/{env_name}" 
                                 hx-target="#environment-list" 
                                 hx-swap="innerHTML"
-                                hx-indicator="#form-indicator">
+                                hx-indicator="#form-indicator"
+                                hx-on::before-request="console.log('HTMX request starting')"
+                                hx-on::after-request="console.log('HTMX request completed')"
+                                hx-on::response-error="console.error('HTMX error:', event.detail)">
                                 <!-- Add hidden loading indicator -->
                                 <div id="form-indicator" class="htmx-indicator fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center rounded-lg" style="display:none;">
                                     <div class="bg-white p-4 rounded-lg shadow-lg flex items-center space-x-3">
@@ -466,25 +444,65 @@ async def edit_environment_form(request: Request, env_name: str):
                                     </div>
                                 </div>
                                 <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">
+                                    <div class="bg-gray-50 p-3 rounded-md">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
                                             Connection Details
                                         </label>
-                                        <div class="mt-1 text-sm text-gray-500">
-                                            Host: {creds.host}:{creds.port}<br>
-                                            Database: {creds.database}<br>
-                                            Username: {creds.username}<br>
-                                            Type: {env.database_type.value}
+                                        <div class="text-sm text-gray-600 space-y-1">
+                                            <div><span class="font-medium">Host:</span> {creds.host}:{creds.port}</div>
+                                            <div><span class="font-medium">Database:</span> {creds.database}</div>
+                                            <div><span class="font-medium">Username:</span> {creds.username}</div>
+                                            <div><span class="font-medium">Type:</span> {env.database_type.value}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-blue-50 p-3 rounded-md">
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Password Status
+                                        </label>
+                                        <div class="text-sm">
+                                            <div class="mb-1">
+                                                <span class="font-medium">Status:</span> {password_status_html}
+                                            </div>
+                                            {date_details_html}
                                         </div>
                                     </div>
                                     
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700">
-                                            Password Status
+                                        <label for="current_password" class="block text-sm font-medium text-gray-700">
+                                            Current Password
                                         </label>
-                                        <div class="mt-1 text-sm">
-                                            {password_status_html}
-                                            {date_details_html}
+                                        <div class="mt-1 relative">
+                                            <input type="password" 
+                                                   id="current_password" 
+                                                   value="{creds.password.get_secret_value()}"
+                                                   class="block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-100 pr-20"
+                                                   readonly>
+                                            <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                <button type="button"
+                                                        onclick="copyPassword('current_password')"
+                                                        title="Copy password"
+                                                        class="p-1 text-gray-400 hover:text-indigo-600">
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                    </svg>
+                                                </button>
+                                                <button type="button"
+                                                        onclick="togglePasswordVisibility('current_password', 'eye_icon_current')"
+                                                        title="Toggle visibility"
+                                                        class="p-1 text-gray-400 hover:text-indigo-600">
+                                                    <svg id="eye_icon_current" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <!-- Eye closed icon (default) -->
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            Password is stored securely ({len(creds.password.get_secret_value())} characters). Use icons to reveal or copy.
+                                        </p>
+                                        <div id="copy_notification" class="hidden mt-1 text-xs text-green-600">
+                                            Password copied to clipboard!
                                         </div>
                                     </div>
                                     
@@ -492,8 +510,19 @@ async def edit_environment_form(request: Request, env_name: str):
                                         <label for="password" class="block text-sm font-medium text-gray-700">
                                             New Password (leave blank to keep current)
                                         </label>
-                                        <input type="password" name="password" id="password"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                        <div class="mt-1 relative">
+                                            <input type="password" name="password" id="password"
+                                                   placeholder="Enter new password to change"
+                                                   class="focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md pr-10">
+                                            <button type="button"
+                                                    onclick="togglePasswordVisibility('password', 'eye_icon_new')"
+                                                    class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                                <svg id="eye_icon_new" class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <!-- Eye closed icon (default) -->
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                     
                                     <div>
@@ -509,23 +538,37 @@ async def edit_environment_form(request: Request, env_name: str):
                                     </div>
                                     
                                     <div>
+                                        <label for="current_expiry" class="block text-sm font-medium text-gray-700">
+                                            Current Expiry Date
+                                        </label>
+                                        <input type="text" id="current_expiry" 
+                                               value="{password_expires_at.strftime('%Y-%m-%d') if password_expires_at else 'Not set'}"
+                                               class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md bg-gray-100"
+                                               disabled>
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            {f'{days_left} days remaining' if days_left is not None else 'No expiry tracking'}
+                                        </p>
+                                    </div>
+                                    
+                                    <div>
                                         <label for="expires_days" class="block text-sm font-medium text-gray-700">
-                                            Password Expiry (days)
+                                            Password Expiry Period (days)
                                         </label>
                                         <input type="number" name="expires_days" id="expires_days" 
                                                value="{expiry_period}"
-                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                               min="0"
+                                               class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                               onchange="updateExpiryPreview()">
                                         <p class="mt-1 text-xs text-gray-500">
-                                            Total days passwords are valid for (from update date).
-                                            {'''<br><span class="text-yellow-600">Note: Updating this will set the expiry date.</span>''' if password_expires_at is None else ""}
+                                            Days until expiry from the update date (0 to disable)
                                         </p>
+                                        <p id="expiry-preview" class="mt-1 text-xs text-blue-600"></p>
                                     </div>
                                 </div>
                                 
                                 <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
                                     <button type="submit"
-                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                            onclick="this.disabled=true; this.form.submit();">
+                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                                         Update
                                     </button>
                                     <button type="button" 
@@ -540,6 +583,134 @@ async def edit_environment_form(request: Request, env_name: str):
                 </div>
             </div>
         </div>
+        <script>
+            // Enable HTMX debugging
+            if (typeof htmx !== 'undefined') {{
+                htmx.logAll();
+                console.log('HTMX version:', htmx.version);
+                // Process the form to ensure HTMX is aware of it
+                htmx.process(document.querySelector('form[hx-put]'));
+            }} else {{
+                console.error('HTMX is not loaded!');
+            }}
+            
+            // Function to toggle password visibility
+            function togglePasswordVisibility(inputId, iconId) {{
+                const input = document.getElementById(inputId);
+                const icon = document.getElementById(iconId);
+                
+                if (input.type === 'password') {{
+                    input.type = 'text';
+                    // Change to eye open icon
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+                    icon.classList.remove('text-gray-400');
+                    icon.classList.add('text-indigo-600');
+                }} else {{
+                    input.type = 'password';
+                    // Change back to eye closed icon
+                    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+                    icon.classList.remove('text-indigo-600');
+                    icon.classList.add('text-gray-400');
+                }}
+            }}
+            
+            // Function to copy password to clipboard
+            function copyPassword(inputId) {{
+                const input = document.getElementById(inputId);
+                const notification = document.getElementById('copy_notification');
+                
+                // Temporarily change type to text if needed
+                const wasPassword = input.type === 'password';
+                if (wasPassword) {{
+                    input.type = 'text';
+                }}
+                
+                // Select and copy
+                input.select();
+                input.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {{
+                    document.execCommand('copy');
+                    // Show notification
+                    notification.classList.remove('hidden');
+                    setTimeout(() => {{
+                        notification.classList.add('hidden');
+                    }}, 3000);
+                }} catch (err) {{
+                    console.error('Failed to copy password:', err);
+                    alert('Failed to copy password. Please select and copy manually.');
+                }}
+                
+                // Restore password type if needed
+                if (wasPassword) {{
+                    input.type = 'password';
+                }}
+                
+                // Remove selection
+                input.blur();
+            }}
+            
+            // Function to update expiry preview
+            function updateExpiryPreview() {{
+                const updateDateInput = document.getElementById('password_updated_at');
+                const expireDaysInput = document.getElementById('expires_days');
+                const preview = document.getElementById('expiry-preview');
+                
+                const updateDate = updateDateInput.value;
+                const expireDays = parseInt(expireDaysInput.value) || 0;
+                
+                if (updateDate && expireDays > 0) {{
+                    const date = new Date(updateDate + 'T00:00:00Z');
+                    date.setDate(date.getDate() + expireDays);
+                    
+                    const expiryDate = date.toLocaleDateString('en-US', {{
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }});
+                    
+                    // Calculate days from today
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const daysUntilExpiry = Math.floor((date - today) / (1000 * 60 * 60 * 24));
+                    
+                    let message = `New expiry date will be: ${{expiryDate}}`;
+                    let className = 'text-blue-600';
+                    
+                    if (daysUntilExpiry < 0) {{
+                        message += ` (expired ${{Math.abs(daysUntilExpiry)}} days ago)`;
+                        className = 'text-red-600';
+                    }} else if (daysUntilExpiry === 0) {{
+                        message += ` (expires today!)`;
+                        className = 'text-red-600 font-medium';
+                    }} else if (daysUntilExpiry <= 7) {{
+                        message += ` (in ${{daysUntilExpiry}} days)`;
+                        className = 'text-red-600';
+                    }} else if (daysUntilExpiry <= 30) {{
+                        message += ` (in ${{daysUntilExpiry}} days)`;
+                        className = 'text-yellow-600';
+                    }} else {{
+                        message += ` (in ${{daysUntilExpiry}} days)`;
+                        className = 'text-green-600';
+                    }}
+                    
+                    preview.className = `mt-1 text-xs ${{className}}`;
+                    preview.textContent = message;
+                }} else if (expireDays === 0) {{
+                    preview.className = 'mt-1 text-xs text-gray-600';
+                    preview.textContent = 'Password expiry tracking will be disabled';
+                }} else {{
+                    preview.textContent = '';
+                }}
+            }}
+            
+            // Add event listeners
+            document.getElementById('password_updated_at').addEventListener('change', updateExpiryPreview);
+            document.getElementById('expires_days').addEventListener('input', updateExpiryPreview);
+            
+            // Initial calculation
+            updateExpiryPreview();
+        </script>
         """
 
         return HTMLResponse(content=html)
@@ -558,6 +729,11 @@ async def update_environment(request: Request, env_name: str):
     """Update an environment."""
     try:
         form_data = await request.form()
+        # Never log sensitive form data - create sanitized version for logging
+        safe_form_data = dict(form_data)
+        if 'password' in safe_form_data:
+            safe_form_data['password'] = '***REDACTED***'
+        logger.info(f"Updating environment {env_name} with form data keys: {list(form_data.keys())}")
         manager = CredentialManager()
 
         # Get existing credentials
@@ -565,16 +741,24 @@ async def update_environment(request: Request, env_name: str):
 
         # Get the expires_days value
         expires_days = int(form_data.get("expires_days", 90))
+        
+        # Calculate current expiry period if it exists
+        current_expiry_days = 90  # Default
+        if creds.password_expires_at and creds.password_updated_at:
+            delta = creds.password_expires_at - creds.password_updated_at
+            current_expiry_days = delta.days
+        
+        logger.debug(f"Current state for {env_name}: updated_at={creds.password_updated_at}, expires_at={creds.password_expires_at}, current_expiry_days={current_expiry_days}")
 
         # Check if password updated date was changed
         new_update_date_str = form_data.get("password_updated_at", "").strip()
-        password_updated_at = None
+        form_provided_date = None  # Track if date was explicitly provided in form
         if new_update_date_str:
             # Parse the date from the form
             try:
                 # Parse as naive datetime then make timezone aware
                 naive_dt = datetime.strptime(new_update_date_str, "%Y-%m-%d")
-                password_updated_at = naive_dt.replace(tzinfo=timezone.utc)
+                form_provided_date = naive_dt.replace(tzinfo=timezone.utc)
             except ValueError:
                 return HTMLResponse(
                     content='<div class="text-red-600 p-4">Error: Invalid date format</div>',
@@ -583,18 +767,41 @@ async def update_environment(request: Request, env_name: str):
 
         # Update password or other fields if needed
         new_password = form_data.get("password", "").strip()
+        old_password = creds.password.get_secret_value()
+        logger.info(f"Password update check: new_provided={bool(new_password)}, new_length={len(new_password) if new_password else 0}, old_length={len(old_password)}")
+        
+        # Determine what date to use
+        # Priority: 1. Form-provided date, 2. Existing date (if no form date)
+        if form_provided_date:
+            password_updated_at = form_provided_date
+            date_changed = (password_updated_at != creds.password_updated_at)
+            logger.debug(f"Using form-provided date: {password_updated_at}, changed from: {creds.password_updated_at}")
+        else:
+            # No date in form, use existing
+            password_updated_at = creds.password_updated_at
+            date_changed = False
+            # Ensure it's timezone aware
+            if password_updated_at and password_updated_at.tzinfo is None:
+                password_updated_at = password_updated_at.replace(tzinfo=timezone.utc)
+            logger.debug(f"No date in form, using existing: {password_updated_at}")
 
         # If there's no password_expires_at but we have updated_at and expires_days,
         # we should update to add the expiry
         needs_expiry_fix = (
             creds.password_expires_at is None
-            and (creds.password_updated_at or password_updated_at)
+            and password_updated_at
             and expires_days > 0
         )
+        
+        # Check if expiry period actually changed
+        expiry_changed = (expires_days != current_expiry_days)
 
-        # Always consider an update needed if expiry days are set or needs fixing
+        # Determine if we need to update
         update_needed = (
-            new_password or password_updated_at or expires_days > 0 or needs_expiry_fix
+            new_password or          # Password changed
+            date_changed or           # Date explicitly changed
+            expiry_changed or         # Expiry period changed
+            needs_expiry_fix          # Need to fix missing expiry
         )
 
         if update_needed:
@@ -602,17 +809,13 @@ async def update_environment(request: Request, env_name: str):
             if not new_password:
                 # If only changing the update date or expiry, reuse existing password
                 new_password = creds.password.get_secret_value()
+                logger.debug(f"No new password provided, using existing password")
+            else:
+                logger.info(f"New password provided, will update password")
 
-            # Use the provided update date or existing one
-            if not password_updated_at:
-                password_updated_at = creds.password_updated_at
-                # Ensure it's timezone aware
-                if password_updated_at and password_updated_at.tzinfo is None:
-                    password_updated_at = password_updated_at.replace(
-                        tzinfo=timezone.utc
-                    )
-
-            # Always set credentials with expiry days to ensure expiry is calculated
+            logger.info(f"Calling set_credentials with password_length={len(new_password)}, updated_at={password_updated_at}")
+            
+            # Set credentials with the custom password_updated_at timestamp
             manager.set_credentials(
                 env_name,
                 host=creds.host,
@@ -621,47 +824,20 @@ async def update_environment(request: Request, env_name: str):
                 username=creds.username,
                 password=new_password,
                 password_expires_days=expires_days if expires_days > 0 else None,
+                password_updated_at=password_updated_at,  # Pass the custom timestamp
             )
-
-            # If we need to modify the update date, update it in the backend
-            if password_updated_at and password_updated_at != creds.password_updated_at:
-                # We need to update the password_updated_at field directly
-                for backend in manager.backends:
-                    if backend.is_available():
-                        try:
-                            # Get the raw credentials from the backend
-                            result = backend.get_credential(f"dbcreds:{env_name}")
-                            if result:
-                                username, password, metadata = result
-                                # Update the password_updated_at field in metadata
-                                metadata["password_updated_at"] = (
-                                    password_updated_at.isoformat()
-                                )
-                                # Always calculate the new expiry date if expires_days is set
-                                if expires_days > 0:
-                                    expires_at = password_updated_at + timedelta(
-                                        days=expires_days
-                                    )
-                                    metadata["password_expires_at"] = (
-                                        expires_at.isoformat()
-                                    )
-                                # Save back to the backend
-                                backend.set_credential(
-                                    f"dbcreds:{env_name}", username, password, metadata
-                                )
-                                break
-                        except Exception as backend_error:
-                            logger.error(
-                                f"Error updating credentials in backend {backend.__class__.__name__}: {backend_error}"
-                            )
-                            continue
 
             # Log what we did
             logger.info(
                 f"Updated environment {env_name}: password_changed={bool(form_data.get('password'))}, "
-                f"date_updated={bool(password_updated_at != creds.password_updated_at)}, "
-                f"expiry_fixed={needs_expiry_fix}"
+                f"date_changed={date_changed}, "
+                f"expiry_days={expires_days}, "
+                f"password_updated_at={password_updated_at.isoformat() if password_updated_at else 'None'}"
             )
+            
+            # Verify the update by immediately retrieving
+            verify_creds = manager.get_credentials(env_name, check_expiry=False)
+            logger.info(f"Verification after update: password_matches_new={verify_creds.password.get_secret_value() == new_password}, password_length={len(verify_creds.password.get_secret_value())}")
 
         # Get updated environments list
         environments = manager.list_environments()
@@ -1071,6 +1247,10 @@ async def get_environment_expiry(env_name: str):
 
 def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
     """Run the web server."""
+    # Show security warnings in development
+    if not os.getenv("DBCREDS_PRODUCTION", "").lower() == "true":
+        print_security_warnings()
+    
     console.print("\n[bold blue]Starting dbcreds web server[/bold blue]")
     console.print(f"[green]➜[/green] Local:   http://localhost:{port}")
     console.print(f"[green]➜[/green] Network: http://{host}:{port}\n")

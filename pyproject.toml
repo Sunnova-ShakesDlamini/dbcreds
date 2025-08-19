@@ -57,6 +57,11 @@ dev = [
 mysql = ["mysqlclient>=2.2.0"]
 oracle = ["oracledb>=1.4.0"]
 mssql = ["pyodbc>=5.0.0"]
+security = [
+    "python-gnupg>=0.5.0",
+    "pyperclip>=1.8.0",
+    "gitpython>=3.1.0",
+]
 
 [project.scripts]
 dbcreds = "dbcreds.cli:app"
@@ -78,7 +83,16 @@ build-backend = "setuptools.build_meta"
 packages = ["dbcreds", "dbcreds.backends", "dbcreds.core", "dbcreds.web", "dbcreds.utils"]
 
 [tool.setuptools.package-data]
-"dbcreds.web" = ["templates/*.html", "templates/**/*.html"]
+"dbcreds.web" = [
+    "templates/*.html", 
+    "templates/**/*.html",
+    "static/*.css",
+    "static/*.js", 
+    "static/*.png",
+    "static/*.svg",
+    "static/*.ico",
+    "static/**/*"
+]
 
 [tool.ruff]
 line-length = 120

@@ -34,3 +34,15 @@ class ValidationError(CredentialError):
     """Raised when credential validation fails."""
 
     pass
+
+
+class SecurityError(CredentialError):
+    """Raised when security operations fail."""
+
+    pass
+
+
+class AuditError(CredentialError):
+    """Raised when audit operations fail."""
+
+    pass

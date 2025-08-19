@@ -252,6 +252,7 @@ class CredentialManager:
         username: str,
         password: str,
         password_expires_days: Optional[int] = 90,
+        password_updated_at: Optional[datetime] = None,
         **options,
     ):
         """
@@ -265,6 +266,7 @@ class CredentialManager:
             username: Database username
             password: Database password
             password_expires_days: Days until password expires (None for no expiry)
+            password_updated_at: Optional custom password update timestamp
             **options: Additional connection options
 
         Returns:
@@ -287,10 +289,17 @@ class CredentialManager:
 
         env = self.environments[env_name]
 
-        # Calculate password expiration
+        # Use provided timestamp or current time
+        if password_updated_at is None:
+            password_updated_at = datetime.now(timezone.utc)
+        # Ensure timezone aware
+        elif password_updated_at.tzinfo is None:
+            password_updated_at = password_updated_at.replace(tzinfo=timezone.utc)
+
+        # Calculate password expiration based on the update timestamp
         password_expires_at = None
         if password_expires_days:
-            password_expires_at = datetime.now(timezone.utc) + timedelta(
+            password_expires_at = password_updated_at + timedelta(
                 days=password_expires_days
             )
 
@@ -303,18 +312,25 @@ class CredentialManager:
             username=username,
             password=password,
             options=options,
+            password_updated_at=password_updated_at,
             password_expires_at=password_expires_at,
         )
 
         # Store in backends
         stored = False
+        _get_logger().debug(f"Storing credentials for {env_name} (dates updated)")
         for backend in self.backends:
             try:
+                # Prepare metadata without username/password (they're passed separately)
+                # Use model_dump with mode='json' to convert datetime objects to ISO strings
+                metadata = creds.model_dump(mode='json')
+                metadata.pop('username', None)
+                metadata.pop('password', None)
                 if backend.set_credential(
-                    f"dbcreds:{env_name}", username, password, creds.model_dump()
+                    f"dbcreds:{env_name}", username, password, metadata
                 ):
                     stored = True
-                    _get_logger().debug(f"Stored credentials in {backend.__class__.__name__}")
+                    _get_logger().debug(f"Successfully stored credentials in {backend.__class__.__name__}")
             except Exception as e:
                 _get_logger().debug(f"Failed to store in {backend.__class__.__name__}: {e}")
 
@@ -360,6 +376,8 @@ class CredentialManager:
                 result = backend.get_credential(f"dbcreds:{env_name}")
                 if result:
                     username, password, metadata = result
+                    # Remove 'environment' from metadata if it exists to avoid duplicate
+                    metadata.pop('environment', None)
                     creds = DatabaseCredentials(
                         environment=env_name,
                         username=username,
