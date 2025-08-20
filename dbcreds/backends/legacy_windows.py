@@ -13,7 +13,6 @@ from typing import Any, Dict, Optional, Tuple
 from loguru import logger
 
 from dbcreds.backends.windows import CREDENTIAL, WindowsCredentialBackend
-from dbcreds.core.models import DatabaseType
 
 
 class LegacyWindowsBackend(WindowsCredentialBackend):

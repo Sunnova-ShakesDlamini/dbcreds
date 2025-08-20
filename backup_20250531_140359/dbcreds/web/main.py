@@ -24,9 +24,7 @@ from dbcreds import __version__
 from dbcreds.core.exceptions import CredentialError
 from dbcreds.core.manager import CredentialManager
 from dbcreds.web.errors import web_error_handler
-from datetime import datetime
 from dbcreds.core.models import DatabaseType
-import json
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 # Install rich traceback handler
@@ -121,7 +119,7 @@ async def index(request: Request):
                 "version": __version__,
             },
         )
-    except Exception as e:
+    except Exception:
         # Errors will be caught by exception handlers
         raise
 
@@ -189,7 +187,7 @@ async def settings(request: Request):
                 "backends": backends_info,
             },
         )
-    except Exception as e:
+    except Exception:
         # Errors will be caught by exception handlers
         raise
 
@@ -647,7 +645,7 @@ async def get_environment_expiry(env_name: str):
 
 def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
     """Run the web server."""
-    console.print(f"\n[bold blue]Starting dbcreds web server[/bold blue]")
+    console.print("\n[bold blue]Starting dbcreds web server[/bold blue]")
     console.print(f"[green]➜[/green] Local:   http://localhost:{port}")
     console.print(f"[green]➜[/green] Network: http://{host}:{port}\n")
     

@@ -1,15 +1,12 @@
 # tests/conftest.py
 """Shared test fixtures."""
 
-import os
 import tempfile
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
 from dbcreds.core.manager import CredentialManager
-from dbcreds.core.models import DatabaseType
 from dbcreds.web.main import app
 
 

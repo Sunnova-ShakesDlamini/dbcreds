@@ -2,11 +2,10 @@
 """Error handling for the web interface."""
 
 import sys
-import traceback
 from typing import Optional
 
 from fastapi import Request, status
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from loguru import logger
 from rich.console import Console
 from rich.panel import Panel

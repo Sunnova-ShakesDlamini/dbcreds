@@ -10,8 +10,6 @@ This backend provides GPG encryption for credentials, supporting:
 """
 
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 

@@ -7,7 +7,7 @@ making it easy to get started with dbcreds.
 """
 
 from contextlib import contextmanager
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine

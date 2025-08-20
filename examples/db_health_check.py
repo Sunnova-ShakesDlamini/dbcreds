@@ -4,7 +4,6 @@
 import time
 from datetime import datetime
 from dbcreds import CredentialManager, get_connection
-import smtplib
 from email.mime.text import MIMEText
 
 def check_database_health(env_name):
@@ -54,7 +53,7 @@ def send_alert(results):
     
     # Configure your email settings
     msg = MIMEText(
-        f"The following databases are unhealthy:\n\n" +
+        "The following databases are unhealthy:\n\n" +
         "\n".join(unhealthy)
     )
     msg['Subject'] = 'Database Health Alert'

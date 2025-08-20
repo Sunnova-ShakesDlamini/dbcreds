@@ -14,7 +14,6 @@ from typing import Optional
 import pyperclip
 from loguru import logger
 
-from dbcreds.core.exceptions import SecurityError
 
 
 class SecureClipboard:

@@ -5,7 +5,6 @@ Migration script for importing existing PowerShell credentials into dbcreds.
 
 import os
 import sys
-from typing import Optional
 
 import typer
 from rich.console import Console

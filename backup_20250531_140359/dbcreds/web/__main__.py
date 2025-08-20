@@ -3,7 +3,6 @@
 
 import sys
 
-import typer
 from rich.console import Console
 
 from dbcreds.web.main import run_server

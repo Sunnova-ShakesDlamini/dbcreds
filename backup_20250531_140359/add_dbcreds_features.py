@@ -47,7 +47,7 @@ def create_backup(project_path):
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     backup_dir = f"backup_{timestamp}"
     
-    print_info(f"Creating backup of current project...")
+    print_info("Creating backup of current project...")
     
     # Copy everything except certain directories
     ignore_patterns = shutil.ignore_patterns(

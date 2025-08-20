@@ -32,7 +32,6 @@ from dbcreds.web.errors import web_error_handler
 from dbcreds.web.security_config import (
     get_security_headers,
     print_security_warnings,
-    sanitize_log_data,
 )
 
 # Install rich traceback handler
@@ -809,9 +808,9 @@ async def update_environment(request: Request, env_name: str):
             if not new_password:
                 # If only changing the update date or expiry, reuse existing password
                 new_password = creds.password.get_secret_value()
-                logger.debug(f"No new password provided, using existing password")
+                logger.debug("No new password provided, using existing password")
             else:
-                logger.info(f"New password provided, will update password")
+                logger.info("New password provided, will update password")
 
             logger.info(f"Calling set_credentials with password_length={len(new_password)}, updated_at={password_updated_at}")
             

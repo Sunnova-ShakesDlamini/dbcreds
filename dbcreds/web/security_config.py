@@ -7,8 +7,6 @@ import os
 from typing import Dict, Any
 
 from fastapi import Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 
 def get_security_headers() -> Dict[str, str]:
@@ -181,7 +179,6 @@ server {
 
 def print_security_warnings():
     """Print security warnings for development mode."""
-    import sys
     from rich.console import Console
     from rich.panel import Panel
     

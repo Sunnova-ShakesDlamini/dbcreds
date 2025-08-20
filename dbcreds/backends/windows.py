@@ -12,7 +12,6 @@ import json
 import sys
 from typing import Any, Dict, Optional, Tuple
 
-from loguru import logger
 
 from dbcreds.backends.base import CredentialBackend
 

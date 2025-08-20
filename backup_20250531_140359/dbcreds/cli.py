@@ -8,7 +8,6 @@ credentials using Typer and Rich.
 
 import os
 import sys
-from datetime import datetime
 from typing import Optional
 
 import typer
@@ -231,7 +230,7 @@ def show(
             days_left = creds.days_until_expiry()
             if days_left is not None:
                 if days_left <= 0:
-                    details += f"\n[bold red]Status: EXPIRED[/bold red]"
+                    details += "\n[bold red]Status: EXPIRED[/bold red]"
                 elif days_left <= 14:
                     details += f"\n[bold yellow]Expires in: {days_left} days[/bold yellow]"
                 else:

@@ -8,7 +8,7 @@ sections in the homepage, maintaining all the styling and layout.
 
 import re
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 
 def extract_readme_sections(readme_path: Path) -> Dict[str, str]:

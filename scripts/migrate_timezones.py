@@ -6,11 +6,9 @@ Run this script to update all existing credentials with timezone-aware datetimes
 """
 
 import sys
-from datetime import datetime, timezone
 
 from loguru import logger
 from rich.console import Console
-from rich.panel import Panel
 from rich.prompt import Confirm
 
 from dbcreds.core.manager import CredentialManager
@@ -76,7 +74,7 @@ def migrate_credentials():
                 console.print(f"[red]✗ Error processing {env.name}: {e}[/red]")
                 logger.error(f"Failed to migrate {env.name}: {e}")
         
-        console.print(f"\n[bold green]Migration complete![/bold green]")
+        console.print("\n[bold green]Migration complete![/bold green]")
         console.print(f"Updated {updated_count} environments.")
         
     except Exception as e:
