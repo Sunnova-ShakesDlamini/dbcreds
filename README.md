@@ -1,33 +1,42 @@
 # README.md
+
 <p align="center">
-  <img src="docs/assets/images/logo.png" alt="dbcreds logo" width="128">
+
+<img src="docs/assets/images/logo.png" alt="dbcreds logo" width="128"/>
+
 </p>
 
-<h1 align="center">dbcreds</h1>
+<h1 align="center">
+
+dbcreds
+
+</h1>
 
 <p align="center">
-  Professional database credentials management with security and team collaboration in mind.
+
+Professional database credentials management with security and team collaboration in mind.
+
 </p>
 
 ## Features
 
---8<-- "docs/includes/features-list.md"
+--8\<-- "docs/includes/features-list.md"
 
 ## Installation
 
---8<-- "docs/includes/installation-full.md"
+--8\<-- "docs/includes/installation-full.md"
 
 ## Quick Start
 
 ### 1. Initialize dbcreds
 
-```bash
+``` bash
 dbcreds init
 ```
 
 ### 2. Add credentials
 
-```bash
+``` bash
 # Add development database
 dbcreds add dev --type postgresql
 # Interactive prompts for connection details
@@ -39,17 +48,17 @@ dbcreds add prod --type postgresql --server prod.db.com --port 5432 --database m
 
 ### 3. Use in Python
 
---8<-- "docs/includes/python-examples.md"
+--8\<-- "docs/includes/python-examples.md"
 
 ## CLI Usage
 
---8<-- "docs/includes/cli-examples.md"
+--8\<-- "docs/includes/cli-examples.md"
 
 ## Web Interface
 
 Start the web interface for team credential management:
 
-```bash
+``` bash
 dbcreds-server
 # Visit http://localhost:8000
 ```
@@ -60,15 +69,15 @@ dbcreds stores configuration in `~/.dbcreds/config.json` and credentials in your
 
 ## Development
 
---8<-- "docs/includes/development.md"
+--8\<-- "docs/includes/development.md"
 
 ## Security
 
-- Credentials are never stored in plain text
-- Each environment has isolated credentials
-- Password rotation reminders
-- Audit logging for credential access
-- Team-based access control in web UI
+-   Credentials are never stored in plain text
+-   Each environment has isolated credentials
+-   Password rotation reminders
+-   Audit logging for credential access
+-   Team-based access control in web UI
 
 ## License
 

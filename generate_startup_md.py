@@ -158,8 +158,14 @@ class ProjectDocGenerator:
                         category = self.categorize_file(file)
                         files_by_category[category].append(str(file))
 
-            # Find template files
+            # Find template and static files
             for pattern in ["*.html", "*.jinja2", "*.j2"]:
+                for file in package_dir.rglob(pattern):
+                    if not self.should_exclude(file):
+                        files_by_category["Templates"].append(str(file))
+            
+            # Find static files (CSS, JS, images, etc.)
+            for pattern in ["*.css", "*.js", "*.png", "*.svg", "*.ico", "*.jpg", "*.jpeg", "*.gif"]:
                 for file in package_dir.rglob(pattern):
                     if not self.should_exclude(file):
                         files_by_category["Templates"].append(str(file))
@@ -226,6 +232,15 @@ class ProjectDocGenerator:
     def read_file_content(self, file_path):
         """Read and return the content of a file."""
         try:
+            path = Path(file_path)
+            ext = path.suffix.lower()
+            
+            # Skip reading binary files
+            binary_extensions = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip", ".tar", ".gz"}
+            if ext in binary_extensions:
+                return f"[Binary file: {path.name}]"
+            
+            # Handle SVG as text (it's XML)
             with open(file_path, "r", encoding="utf-8") as f:
                 return f.read()
         except Exception as e:
@@ -236,6 +251,14 @@ class ProjectDocGenerator:
         """Format content as a markdown code block."""
         path = Path(file_path)
         ext = path.suffix.lower()
+
+        # Binary file extensions that shouldn't be displayed as text
+        binary_extensions = {".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", ".pdf", ".zip", ".tar", ".gz"}
+        
+        if ext in binary_extensions:
+            # For binary files, just show the file reference
+            rel_path = path.relative_to(self.project_root) if self.project_root in path.parents else path.name
+            return f"**Binary file:** `{rel_path}` ({ext.upper()} image/asset)"
 
         # Language mapping
         lang_map = {
@@ -254,6 +277,8 @@ class ProjectDocGenerator:
             ".sh": "bash",
             ".bat": "batch",
             ".ps1": "powershell",
+            ".svg": "svg",
+            ".xml": "xml",
         }
 
         lang = lang_map.get(ext, "")
