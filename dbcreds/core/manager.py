@@ -287,8 +287,6 @@ class CredentialManager:
         if env_name not in self.environments:
             raise CredentialNotFoundError(f"Environment '{environment}' not found")
 
-        env = self.environments[env_name]
-
         # Use provided timestamp or current time
         if password_updated_at is None:
             password_updated_at = datetime.now(timezone.utc)
@@ -321,11 +319,12 @@ class CredentialManager:
         _get_logger().debug(f"Storing credentials for {env_name} (dates updated)")
         for backend in self.backends:
             try:
-                # Prepare metadata without username/password (they're passed separately)
+                # Prepare metadata without username/password/environment (they're passed separately)
                 # Use model_dump with mode='json' to convert datetime objects to ISO strings
                 metadata = creds.model_dump(mode='json')
                 metadata.pop('username', None)
                 metadata.pop('password', None)
+                metadata.pop('environment', None)
                 if backend.set_credential(
                     f"dbcreds:{env_name}", username, password, metadata
                 ):
